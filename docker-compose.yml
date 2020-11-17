@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  ts:
+    container_name: ts
+    image: tensorflow/serving
+    ports:
+      - 8501:8501
+    volumes:
+      - /Users/martin/Documents/GitHub/ai-api/Models/:/models/
+    command: >-
+      --model_config_file=/models/models.config
+      --model_config_file_poll_wait_seconds=60

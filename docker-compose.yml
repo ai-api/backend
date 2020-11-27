@@ -11,3 +11,12 @@ services:
     command: >-
       --model_config_file=/models/models.config
       --model_config_file_poll_wait_seconds=60
+  
+  db:
+    image: postgres
+    ports: 
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=aiapi
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password

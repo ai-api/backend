@@ -1,3 +1,5 @@
+# WARNING, DO NOT USE NPM COMMANDS, USE YARN!!
+
 ## Typescript
 [Here's](https://basarat.gitbook.io/typescript/) a good resource for learning more about Typescript
 

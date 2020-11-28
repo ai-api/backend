@@ -18,18 +18,20 @@ services:
     networks:
       - aiapi_net
     ports: 
-      - 5432:5432
+      - 7878:5432
     environment:
-      - POSTGRES_DB=aiapi
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=$DB_NAME
+      - POSTGRES_USER=$DB_USERNAME
+      - POSTGRES_PASSWORD=$DB_PASSWORD
 
   dbgui:
     container_name: dbgui
     image: adminer
+    networks:
+      - aiapi_net
     ports:
      - 7979:8080
-  
+
   nginx:
     container_name: nginx
     build:
@@ -39,7 +41,7 @@ services:
     ports:
       - 8080:80
     environment:
-      - NGINX_DOMAIN=localhost
+      - NGINX_DOMAIN=$DOMAIN
   
 # By creating a vlan for all of the microservices, we can reference each one by it's
 # container name instead of IP address in all of our code

@@ -4,19 +4,46 @@ services:
   ts:
     container_name: ts
     image: tensorflow/serving
-    ports:
-      - 8501:8501
+    networks:
+      - aiapi_net
     volumes:
-      - /Users/martin/Documents/GitHub/ai-api/Models/:/models/
+      - ./models/:/models/
     command: >-
       --model_config_file=/models/models.config
       --model_config_file_poll_wait_seconds=60
   
   db:
+    container_name: db
     image: postgres
+    networks:
+      - aiapi_net
     ports: 
       - 5432:5432
     environment:
       - POSTGRES_DB=aiapi
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
+
+  dbgui:
+    container_name: dbgui
+    image: adminer
+    ports:
+     - 7979:8080
+  
+  nginx:
+    container_name: nginx
+    build:
+      context: nginx/
+    networks:
+      - aiapi_net
+    ports:
+      - 8080:80
+    environment:
+      - NGINX_DOMAIN=localhost
+  
+# By creating a vlan for all of the microservices, we can reference each one by it's
+# container name instead of IP address in all of our code
+networks:
+  aiapi_net:
+    name: aiapi_net
+    driver: bridge

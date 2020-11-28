@@ -4,7 +4,7 @@
 [Here's](https://basarat.gitbook.io/typescript/) a good resource for learning more about Typescript
 
 ## Install Guide
- 1. Install [yarn] (https://classic.yarnpkg.com/en/docs/install/#windows-stable). (Basically better, newer version of npm)
+ 1. Install [yarn](https://classic.yarnpkg.com/en/docs/install/#windows-stable). (Basically better, newer version of npm)
  2. Run `yarn install`
 
  ## How to Run

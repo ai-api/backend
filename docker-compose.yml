@@ -1,6 +1,42 @@
 version: '3.8'
 
 services:
+  backend:
+    container_name: backend
+    build:
+      context: backend/
+    networks:
+      - aiapi_net
+    ports: 
+      - 8000:80
+  db:
+    container_name: db
+    image: postgres
+    networks:
+      - aiapi_net
+    ports: 
+      - $DB_PORT_EXTERNAL:$DB_PORT_INTERNAL
+    environment:
+      - POSTGRES_DB=$DB_NAME
+      - POSTGRES_USER=$DB_USERNAME
+      - POSTGRES_PASSWORD=$DB_PASSWORD
+  dbgui:
+    container_name: dbgui
+    image: adminer
+    networks:
+      - aiapi_net
+    ports:
+     - 7979:8080
+  nginx:
+    container_name: nginx
+    build:
+      context: nginx/
+    networks:
+      - aiapi_net
+    ports:
+      - 8080:80
+    environment:
+      - NGINX_DOMAIN=$NGINX_DOMAIN
   ts:
     container_name: ts
     image: tensorflow/serving
@@ -12,36 +48,6 @@ services:
       --model_config_file=/models/models.config
       --model_config_file_poll_wait_seconds=60
   
-  db:
-    container_name: db
-    image: postgres
-    networks:
-      - aiapi_net
-    ports: 
-      - 7878:5432
-    environment:
-      - POSTGRES_DB=$DB_NAME
-      - POSTGRES_USER=$DB_USERNAME
-      - POSTGRES_PASSWORD=$DB_PASSWORD
-
-  dbgui:
-    container_name: dbgui
-    image: adminer
-    networks:
-      - aiapi_net
-    ports:
-     - 7979:8080
-
-  nginx:
-    container_name: nginx
-    build:
-      context: nginx/
-    networks:
-      - aiapi_net
-    ports:
-      - 8080:80
-    environment:
-      - NGINX_DOMAIN=$DOMAIN
   
 # By creating a vlan for all of the microservices, we can reference each one by it's
 # container name instead of IP address in all of our code

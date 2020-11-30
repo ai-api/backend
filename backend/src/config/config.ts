@@ -36,4 +36,4 @@ const prod: Config = {
  * to be 'prod' when 'yarn start' is called, and to be 'dev'
  * when 'yarn dev'
  */
-export default process.env.NODE_ENV== 'prod' ? prod : dev;
+export default process.env.NODE_ENV == 'prod' ? prod : dev;

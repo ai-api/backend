@@ -7,11 +7,13 @@ import config from './config/config';
 
 const app = express();
 
-console.log('Hello World from the console!');
+console.log(config.port);
 
 app.get('/', (req,res) => {
    res.send('Hello World!');
 });
 
-app.listen()
+app.listen(config.port, () => {
+   console.log('AI API listening on port ' + config.port);
+});
 

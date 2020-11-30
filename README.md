@@ -11,7 +11,7 @@
 | db | 7878 | 5432 | PostgreSQL Database |
 | dbgui | 7979 | 8080 | A GUI for accessing/modifying the database |
 | nginx | 8080 | 80 | Nginx container that reroutes requests |
-
+| backend | 8000 | 80 | Our backend nodejs server |
 
 ## [Design Docs](https://docs.google.com/document/d/1INPYeMkkMzwxMcpWc0QNHwMBHnJLqR-C87pC0KAKPps/edit?usp=sharing)
 

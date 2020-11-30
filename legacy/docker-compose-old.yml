@@ -26,7 +26,17 @@ services:
     networks:
       - aiapi_net
     ports:
-     - $DB_GUI_PORT_EXTERNAL:$DB_GUI_PORT_INTERNAL
+     - 7979:8080
+  nginx:
+    container_name: nginx
+    build:
+      context: nginx/
+    networks:
+      - aiapi_net
+    ports:
+      - 8080:80
+    environment:
+      - NGINX_DOMAIN=$NGINX_DOMAIN
   ts:
     container_name: ts
     image: tensorflow/serving

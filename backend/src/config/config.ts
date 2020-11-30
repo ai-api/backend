@@ -13,7 +13,7 @@ interface Config {
    }
 }
 const dev: Config = {
-   'port': '8000',
+   'port': process.env.BACKEND_PORT_EXTERNAL || 'config error',
    'db': {
       'name': process.env.DB_NAME || 'config error',
       'username': process.env.DB_USERNAME || 'config error',
@@ -22,7 +22,7 @@ const dev: Config = {
    }
 };
 const prod: Config = {
-   'port': '80',
+   'port':  process.env.BACKEND_PORT_INTERNAL || 'config error',
    'db': {
       'name': process.env.DB_NAME || 'config error',
       'username': process.env.DB_USERNAME || 'config error',

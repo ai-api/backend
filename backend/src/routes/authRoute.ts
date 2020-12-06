@@ -1,5 +1,6 @@
 import express from 'express';
 import { celebrate, Joi, Segments, errors } from 'celebrate';
+import regexTokens from '../config/regexTokens';
 
 const router = express.Router();
 
@@ -8,16 +9,15 @@ const router = express.Router();
  * a refresh token, and returning it in the
  * response
  * Response:
- *    200 OK on success
- *    401 Auth Failed if incorrect pass/login
+ * 200 OK on success, returns a refreshToken
+ * 401 Auth Failed if incorrect pass/login
  * 
  */
 router.post('/', celebrate({
    [Segments.BODY]: Joi.object().keys({
-      username: Joi.string().required(),
-      password: Joi.string().required()
-    }).unknown(),
-    
+      username: Joi.string().regex(regexTokens.username).required(),
+      password: Joi.string().regex(regexTokens.password).required()
+   }).unknown(), 
 }) , (req,res) => {
    res.json('TODO: Not yet implemented');
 });
@@ -30,9 +30,8 @@ router.post('/', celebrate({
 router.post('/google', celebrate({
    [Segments.BODY]: Joi.object().keys({
       idToken: Joi.string().required()
-    }).unknown(),
-    
-}) , (req,res) => {
+   }).unknown(),
+}), (req,res) => {
    res.json('TODO: Not yet implemented');
 });
 
@@ -44,9 +43,8 @@ router.post('/google', celebrate({
 router.post('/refresh', celebrate({
    [Segments.BODY]: Joi.object().keys({
       refreshToken: Joi.string().token().required(), // TODO: add regex to make sure token is proper len
-    }).unknown(),
-    
-}) , (req,res) => {
+   }).unknown(),
+   }), (req,res) => {
    res.json('TODO: Not yet implemented');
 });
 
@@ -60,9 +58,8 @@ router.delete('/', celebrate({
    [Segments.BODY]: Joi.object().keys({
       refreshToken: Joi.string().token().required(), // TODO: add regex to make sure token is proper len
       global: Joi.bool().optional()
-    }).unknown(),
-    
-}) , (req,res) => {
+   }).unknown(),
+}), (req,res) => {
    res.json('TODO: Not yet implemented');
 });
 

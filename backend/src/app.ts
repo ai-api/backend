@@ -3,8 +3,8 @@ import express from 'express';
 import config from './config/config';
 import bodyParser from 'body-parser';
 
-import authRouter from './routes/auth';
-import usersRouter from './routes/users';
+import authRouter from './routes/authRoute';
+import usersRouter from './routes/usersRoute';
 /* Init express */
 const app = express();
 /////////////////////////////////////////////

@@ -4,7 +4,7 @@ import config from './config/config';
 import bodyParser from 'body-parser';
 
 import authRouter from './routes/auth';
-
+import usersRouter from './routes/users';
 /* Init express */
 const app = express();
 /////////////////////////////////////////////
@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 
 /* Handles all requests to /auth */
 app.use('/auth', authRouter);
-
+app.use('/users/', usersRouter);
 /**
  * For some reason you need to add errors()
  * after you add all of the routes, otherwise

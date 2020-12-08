@@ -53,11 +53,12 @@ CREATE TABLE package_flag (
 );
 
 /* Uncomment to delete all tables*/
-
+/*
 DROP TABLE auth;
 DROP TABLE sys_user;
 DROP TABLE package;
 DROP TABLE category;
 DROP TABLE flag;
 DROP TABLE package_flag;
+*/
 

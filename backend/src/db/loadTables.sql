@@ -3,8 +3,8 @@
 /* Create auth table */
 CREATE TABLE auth (
     id int NOT NULL PRIMARY KEY,
-    user_id int NOT NULL,
-    refresh_token varchar NOT NULL
+    userId int NOT NULL,
+    refreshToken varchar NOT NULL
 );
 
 /* Create user table */
@@ -13,16 +13,16 @@ CREATE TABLE sys_user (
     username varchar NOT NULL,
     password varchar NOT NULL,
     email varchar NOT NULL,
-    api_key varchar NOT NULL,
-    profile_picture bytea
+    apiKey varchar NOT NULL,
+    profilePicture bytea
 );
 
 /* Create model table */
 CREATE TABLE package (
     id int NOT NULL PRIMARY KEY,
-    user_id int NOT NULL,
-    last_updated DATE NOT NULL,
-    num_api_calls int ,
+    userId int NOT NULL,
+    lastUpdated DATE NOT NULL,
+    numApiCalls int ,
     name varchar,
     category varchar,
     description varchar,
@@ -48,8 +48,8 @@ CREATE TABLE flag (
 /* Create package-flag table */
 CREATE TABLE package_flag (
     id int NOT NULL PRIMARY KEY,
-    package_id int NOT NULL,
-    flag_id int NOT NULL
+    packageId int NOT NULL,
+    flagId int NOT NULL
 );
 
 /* Uncomment to delete all tables*/

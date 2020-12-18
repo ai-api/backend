@@ -1,8 +1,3 @@
-import * as dotenv from 'dotenv';
-
-/* Read the .env from the root directory of the git */
-dotenv.config({ path: __dirname + '/../../../.env' });
-
 interface Config {
    port: string,
    db: {
@@ -18,31 +13,31 @@ interface Config {
    }
 };
 const dev: Config = {
-   'port': process.env.BACKEND_PORT_EXTERNAL || 'config error',
+   'port': '8080',
    'db': {
-      'name': process.env.DB_NAME || 'config error',
-      'username': process.env.DB_USERNAME || 'config error',
-      'password': process.env.DB_PASSWORD || 'config error',
+      'name': 'aiapi',
+      'username': 'admin',
+      'password': 'c0cac0la',
       'ip': 'localhost',
-      'port': process.env.DB_PORT_EXTERNAL || 'config error'
+      'port': '7979'
    },
    'ts': {
       'ip': 'localhost',
-      'port': process.env.TS_PORT_EXTERNAL || 'config error',
+      'port': '7777'
    }
 };
 const prod: Config = {
-   'port':  process.env.BACKEND_PORT_INTERNAL || 'config error',
+   'port': '80',
    'db': {
-      'name': process.env.DB_NAME || 'config error',
-      'username': process.env.DB_USERNAME || 'config error',
-      'password': process.env.DB_PASSWORD || 'config error',
-      'ip': 'db' || 'config error',
-      'port': process.env.DB_PORT_INTERNAL || 'config error'
+      'name': 'aiapi',
+      'username': 'admin',
+      'password': 'c0cac0la',
+      'ip': 'localhost',
+      'port': '5432'
    },
    'ts': {
       'ip': 'ts',
-      'port': process.env.TS_PORT_EXTERNAL || 'config error',
+      'port': '8501',
    }
 };
 

@@ -8,32 +8,32 @@ services:
     networks:
       - aiapi_net
     ports: 
-      - $BACKEND_PORT_EXTERNAL:$BACKEND_PORT_INTERNAL
+      - 8080:80
   db:
     container_name: db
     image: postgres
     networks:
       - aiapi_net
     ports: 
-      - $DB_PORT_EXTERNAL:$DB_PORT_INTERNAL
+      - 7979:5432
     environment:
-      - POSTGRES_DB=$DB_NAME
-      - POSTGRES_USER=$DB_USERNAME
-      - POSTGRES_PASSWORD=$DB_PASSWORD
+      - POSTGRES_DB=aiapi
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=c0cac0la
   dbgui:
     container_name: dbgui
     image: adminer
     networks:
       - aiapi_net
     ports:
-     - $DB_GUI_PORT_EXTERNAL:$DB_GUI_PORT_INTERNAL
+     - 7878:8080
   ts:
     container_name: ts
     image: tensorflow/serving
     networks:
       - aiapi_net
     ports:
-      - $TS_PORT_EXTERNAL:$TS_PORT_INTERNAL
+      - 7777:8501
     volumes:
       - ./tensorflow/:/models/
     command: >-

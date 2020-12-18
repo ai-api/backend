@@ -1,8 +1,7 @@
 # AI API
 
 ## How to run
- 1. Rename `.env-sample` to `.env` and fill in the `DB_PASSWORD` variable
- 2. run `docker-compose up -d`
+ 1. run `docker-compose up -d`
 
 ## Containers
 | Service Name | External Port | Internal Port | Description |

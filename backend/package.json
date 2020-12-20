@@ -13,6 +13,7 @@
     "dev": "export NODE_ENV=dev && ts-node-dev ./src/app.ts"
   },
   "dependencies": {
+    "@types/pg": "^7.14.7",
     "body-parser": "^1.19.0",
     "celebrate": "^13.0.4",
     "express": "^4.17.1",

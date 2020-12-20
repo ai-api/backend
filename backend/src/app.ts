@@ -1,4 +1,6 @@
 import { celebrate, Joi, Segments, errors } from 'celebrate';
+import {Client} from 'pg';
+import fs from 'fs';
 import express from 'express';
 import config from './config/config';
 import bodyParser from 'body-parser';
@@ -23,6 +25,29 @@ app.use('/users/', usersRouter);
  * it doesn't work
  */
 app.use(errors());
+
+/////////////////////////////////////////////
+/////////// INITIALIZE DATABASE /////////////
+/////////////////////////////////////////////
+
+/* Create and connect to postgres client*/
+fs.readdir('./src/db', (err, files) => {
+   files.forEach(file => {
+     console.log(file);
+   });
+ });
+
+const client = new Client({
+   user: 'admin',
+   host: 'db',
+   database: 'db',
+   password: 'c0cac0la',
+   port: 3211
+});
+/* Connect to postgres client */
+client.connect();
+
+
 /////////////////////////////////////////////
 ////////////// EXPRESS CONFIG ///////////////
 /////////////////////////////////////////////

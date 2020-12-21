@@ -31,12 +31,6 @@ app.use(errors());
 /////////////////////////////////////////////
 
 /* Create and connect to postgres client*/
-fs.readdir('./src/db', (err, files) => {
-   files.forEach(file => {
-     console.log(file);
-   });
- });
-
 const client = new Client({
    user: 'admin',
    host: 'db',

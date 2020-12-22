@@ -1,9 +1,20 @@
 import express from 'express';
 import { celebrate, Joi, Segments, errors } from 'celebrate';
 import regexTokens from '../config/regexTokens';
+import { UserService } from '../services/subjects/userService';
+
+
+/////////////////////////////////////////////
+/////////////// ROUTE CONFIG ////////////////
+/////////////////////////////////////////////
+
+let userService = UserService.getInstance();
+
 
 const router = express.Router();
-
+/////////////////////////////////////////////
+////////////////// ROUTES ///////////////////
+/////////////////////////////////////////////
 /**
  * Description. Creates a new user
  * Response:
@@ -77,3 +88,5 @@ router.delete('/', celebrate({
  * in app.ts
  */
 export default router;
+
+

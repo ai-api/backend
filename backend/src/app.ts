@@ -7,6 +7,10 @@ import bodyParser from 'body-parser';
 
 import authRouter from './routes/authRoute';
 import usersRouter from './routes/usersRoute';
+
+import {Subject} from './services/subjects/subject';
+
+
 /* Init express */
 const app = express();
 /////////////////////////////////////////////
@@ -56,3 +60,6 @@ app.listen(config.port, () => {
 
 
 
+/////////////////////////////////////////////
+/////////////// TEMP/TESTING ////////////////
+/////////////////////////////////////////////

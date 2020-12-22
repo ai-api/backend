@@ -1,5 +1,6 @@
 import { errors } from 'celebrate';
 import { Client } from 'pg';
+import fs from 'fs';
 import express from 'express';
 import config from './config/config';
 import bodyParser from 'body-parser';
@@ -43,6 +44,14 @@ client.connect()
       console.log('ERROR: Could not connect to database!');
       console.log(err);
    });
+
+/* Run SQL script to initialize database tables */
+var initDbSql = fs.readFileSync('src/db/loadTables.sql').toString();
+client.query(initDbSql, function(err){
+   if(err)
+      console.log('ERROR: Could not successfully load tables', err);
+});
+
 /////////////////////////////////////////////
 ////////////// EXPRESS CONFIG ///////////////
 /////////////////////////////////////////////

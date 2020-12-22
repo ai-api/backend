@@ -5,11 +5,11 @@ interface Config {
       ip: string,
       username: string,
       password: string,
-      port: string
+      port: number
    },
    ts: {
       ip: string,
-      port: string
+      port: number
    }
 };
 const dev: Config = {
@@ -19,11 +19,11 @@ const dev: Config = {
       'username': 'admin',
       'password': 'c0cac0la',
       'ip': 'localhost',
-      'port': '7979'
+      'port': 7979
    },
    'ts': {
       'ip': 'localhost',
-      'port': '7777'
+      'port': 7777
    }
 };
 const prod: Config = {
@@ -33,11 +33,11 @@ const prod: Config = {
       'username': 'admin',
       'password': 'c0cac0la',
       'ip': 'localhost',
-      'port': '5432'
+      'port': 5432
    },
    'ts': {
       'ip': 'ts',
-      'port': '8501',
+      'port': 8501,
    }
 };
 

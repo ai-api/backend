@@ -32,14 +32,17 @@ app.use(errors());
 
 /* Create and connect to postgres client*/
 const client = new Client({
-   user: 'admin',
-   host: 'db',
-   database: 'db',
-   password: 'c0cac0la',
-   port: 3211
+   user: config.db.username,
+   host: config.db.ip,
+   database: config.db.name,
+   password: config.db.password,
+   port: config.db.port
 });
 /* Connect to postgres client */
-client.connect();
+client.connect()
+.catch((err: Error) => {
+   console.log('ERROR: Could not connect to database!');
+});
 
 
 /////////////////////////////////////////////

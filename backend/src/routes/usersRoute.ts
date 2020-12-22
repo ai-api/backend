@@ -12,14 +12,6 @@ const router = express.Router();
  */
 router.post('/', celebrate({
    [Segments.BODY]: Joi.object().keys({
-      /**
-       * usernames must:
-       * 1. Be 3-20 chars long
-       * 2. no _ or . at beginning
-       * 3. no __ or _. or .. inside
-       * 4. [a-zA-Z0-9._] are all allowed chars
-       * 5. no _ or . at the end
-       */
       username: Joi.string().regex(regexTokens.username).required(),
       password: Joi.string().regex(regexTokens.password).required(),
       email: Joi.string().email().required()

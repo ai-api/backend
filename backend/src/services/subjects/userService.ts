@@ -25,12 +25,12 @@ export class UserService extends Subject {
        * classes/objects can subscribe to 'listen' for 
        * them
        */
-      let userServiceEvents = [
+      const userServiceEvents = [
          'create',
          'get',
          'update',
          'delete'
-      ]
+      ];
       super(userServiceEvents);
    }
 
@@ -43,7 +43,7 @@ export class UserService extends Subject {
     * if it already exists. If it doesn't exist, will create a
     * new instance and return that
     */
-   public static getInstance() {
+   public static getInstance(): UserService {
       if (!UserService.instance) {
          UserService.instance = new UserService();
       }

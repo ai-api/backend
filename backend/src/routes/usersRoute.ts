@@ -1,5 +1,5 @@
 import express from 'express';
-import { celebrate, Joi, Segments, errors } from 'celebrate';
+import { celebrate, Joi, Segments } from 'celebrate';
 import regexTokens from '../config/regexTokens';
 import { UserService } from '../services/subjects/userService';
 
@@ -8,7 +8,7 @@ import { UserService } from '../services/subjects/userService';
 /////////////// ROUTE CONFIG ////////////////
 /////////////////////////////////////////////
 
-let userService = UserService.getInstance();
+const userService = UserService.getInstance();
 
 
 const router = express.Router();
@@ -27,7 +27,7 @@ router.post('/', celebrate({
       password: Joi.string().regex(regexTokens.password).required(),
       email: Joi.string().email().required()
    }).unknown(),
-   }), (req,res) => {
+}), (req,res) => {
    res.json('TODO: Not yet implemented');
 });
 
@@ -44,7 +44,7 @@ router.get('/', celebrate({
    [Segments.QUERY]: Joi.object().keys({
       userId: Joi.number().positive().integer().required()
    }).unknown(), 
-   }), (req,res) => {
+}), (req,res) => {
    res.json('TODO: Not yet implemented');
 });
 
@@ -63,7 +63,7 @@ router.patch('/', celebrate({
       password: Joi.string(),
       email: Joi.string().email(),
    }).unknown(), 
-   }), (req,res) => {
+}), (req,res) => {
    res.json('TODO: Not yet implemented');
 });
 
@@ -79,7 +79,7 @@ router.delete('/', celebrate({
    [Segments.QUERY]: Joi.object().keys({
       userId: Joi.number().positive().integer().required()
    }).unknown(), 
-   }), (req,res) => {
+}), (req,res) => {
    res.json('TODO: Not yet implemented');
 });
 

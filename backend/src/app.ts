@@ -1,15 +1,11 @@
-import { celebrate, Joi, Segments, errors } from 'celebrate';
-import {Client} from 'pg';
-import fs from 'fs';
+import { errors } from 'celebrate';
+import { Client } from 'pg';
 import express from 'express';
 import config from './config/config';
 import bodyParser from 'body-parser';
 
 import authRouter from './routes/authRoute';
 import usersRouter from './routes/usersRoute';
-
-import {Subject} from './services/subjects/subject';
-
 
 /* Init express */
 const app = express();
@@ -29,7 +25,6 @@ app.use('/users/', usersRouter);
  * it doesn't work
  */
 app.use(errors());
-
 /////////////////////////////////////////////
 /////////// INITIALIZE DATABASE /////////////
 /////////////////////////////////////////////
@@ -44,11 +39,10 @@ const client = new Client({
 });
 /* Connect to postgres client */
 client.connect()
-.catch((err: Error) => {
-   console.log('ERROR: Could not connect to database!');
-});
-
-
+   .catch((err: Error) => {
+      console.log('ERROR: Could not connect to database!');
+      console.log(err);
+   });
 /////////////////////////////////////////////
 ////////////// EXPRESS CONFIG ///////////////
 /////////////////////////////////////////////
@@ -56,10 +50,6 @@ client.connect()
 app.listen(config.port, () => {
    console.log('AI API listening on port ' + config.port);
 });
-
-
-
-
 /////////////////////////////////////////////
 /////////////// TEMP/TESTING ////////////////
 /////////////////////////////////////////////

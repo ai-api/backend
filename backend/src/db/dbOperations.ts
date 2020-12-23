@@ -1,4 +1,29 @@
+import { Client } from 'pg';
 import Package from './data_models/package'
+
+/*
+ * SQL queries with parameters require a string which says
+ * what index each value is located at in the values array
+ * 
+ */
+function getIndicesString(numParams: number): string{
+   var result: Array<string> = [];
+   for(let i = 1; i <= numParams; i++)
+      result.push(`$${i}`);
+   return result.join();
+}
+
+/*
+ * Gets the current date
+ * Return: the date in MM/DD/YYYY format
+ */
+function getDate(): string{
+   var date = new Date();
+   var dd = String(date.getDate()).padStart(2, '0');
+   var mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0
+   var yyyy = date.getFullYear();
+   return mm + '/' + dd + '/' + yyyy;
+}
 
 /*
  * Creates a new package entry in the package table
@@ -6,24 +31,27 @@ import Package from './data_models/package'
  * @model: The data model object to be updated in the database
  * Return: The id of the new entry, -1 otherwise
  */
-export function createPackage(client: object, model: Package): number{
-   // New package must atleast have an associated userID
-   if(!model.userId)
-      return -1;
-
+export function createPackage(client: any, model: Package): number{
    const tableName: string = 'package';
-   var modelColumns: Array<string> = Object.keys(model);
-   console.log('modelColumns:', modelColumns);
-   var paramIndices: Array<string> = [];
-   var values: Array<any> = [];
-   var numParams = 1;
-   for(var column in modelColumns){
-      paramIndices.push(`$${numParams}`)
-      values.push(model[column as keyof Package])
-      numParams++;
+   const date = getDate();
+   const columnNames: Array<string> = ['userId','lastUpdated','numApiCalls','name',
+      'category', 'description', 'input', 'output', 'markdown'];
+   const columnValues: Array<any> = [model.userId, date, 0, model.name,
+      model.category, model.description, model.input, model.output, model.markdown];
+   var valueIndices: string = getIndicesString(columnValues.length);
+   // Specify query command and parameters
+   const queryParams: object = {
+      text: `INSERT INTO ${tableName}(${columnNames.join()}) VALUES(${valueIndices})`,
+      values: columnValues
    }
-   console.log('paramIndices:', paramIndices);
-   console.log('values:', values);
+   // Insert the new package entry
+   client.query(queryParams, (err: any, res: any) =>{
+      if(err)
+         console.log(err);
+      else
+         console.log(res);
+   });
+   //TODO: Create respective flag-package entries in the flag_package table
    return 0;
 }
 

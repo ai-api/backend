@@ -25,12 +25,16 @@ class Package {
         this.output = output;
         this.flags = flags;
         this.markdown = '';
+        this.lastUpdated = '';
     }
+    /*
+     * Creates a new package entry in the package table using
+     * the fields in the current object
+     * @client: The postgres client object
+     * Return: None
+     */
     create(client: any){
         createPackage(client, this);
-    }
-    read(){
-        //TODO
     }
     update(){
         //TODO  

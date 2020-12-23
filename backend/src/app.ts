@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 
 /* Handles all requests to /auth */
 app.use('/auth', authRouter);
-app.use('/users/', usersRouter);
+//app.use('/users/', usersRouter);
 
 /* Used to debug/test database operations */
 app.use('/dbTest/', dbTestRouter);

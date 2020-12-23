@@ -7,7 +7,7 @@ import bodyParser from 'body-parser';
 
 import authRouter from './routes/authRoute';
 import usersRouter from './routes/usersRoute';
-
+import dbTestRouter from './routes/dbTestRoute';
 /* Init express */
 const app = express();
 /////////////////////////////////////////////
@@ -20,6 +20,9 @@ app.use(bodyParser.json());
 /* Handles all requests to /auth */
 app.use('/auth', authRouter);
 app.use('/users/', usersRouter);
+
+/* Used to debug/test database operations */
+app.use('/dbTest/', dbTestRouter);
 /**
  * For some reason you need to add errors()
  * after you add all of the routes, otherwise

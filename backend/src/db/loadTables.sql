@@ -2,14 +2,14 @@
 
 /* Create auth table */
 CREATE TABLE auth (
-    id int NOT NULL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     userId int NOT NULL,
     refreshToken varchar NOT NULL
 );
 
 /* Create user table */
 CREATE TABLE sys_user (
-    id int NOT NULL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     username varchar NOT NULL,
     password varchar NOT NULL,
     email varchar NOT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE sys_user (
 
 /* Create model table */
 CREATE TABLE package (
-    id int NOT NULL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     userId int NOT NULL,
     lastUpdated DATE NOT NULL,
     numApiCalls int ,
@@ -33,21 +33,21 @@ CREATE TABLE package (
 
 /* Create category table */
 CREATE TABLE category (
-    id int NOT NULL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name varchar NOT NULL,
     description varchar NOT NULL
 );
 
 /* Create Flag Table */
 CREATE TABLE flag (
-    id int NOT NULL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name varchar NOT NULL,
     description varchar NOT NULL
 );
 
 /* Create package-flag table */
 CREATE TABLE package_flag (
-    id int NOT NULL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     packageId int NOT NULL,
     flagId int NOT NULL
 );

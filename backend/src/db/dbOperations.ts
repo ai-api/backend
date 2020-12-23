@@ -1,3 +1,32 @@
+import Package from './data_models/package'
+
+/*
+ * Creates a new package entry in the package table
+ * @client: The postgres client
+ * @model: The data model object to be updated in the database
+ * Return: The id of the new entry, -1 otherwise
+ */
+export function createPackage(client: object, model: Package): number{
+   // New package must atleast have an associated userID
+   if(!model.userId)
+      return -1;
+
+   const tableName: string = 'package';
+   var modelColumns: Array<string> = Object.keys(model);
+   console.log('modelColumns:', modelColumns);
+   var paramIndices: Array<string> = [];
+   var values: Array<any> = [];
+   var numParams = 1;
+   for(var column in modelColumns){
+      paramIndices.push(`$${numParams}`)
+      values.push(model[column as keyof Package])
+      numParams++;
+   }
+   console.log('paramIndices:', paramIndices);
+   console.log('values:', values);
+   return 0;
+}
+
 /*
  * Reads an entry of a given id from a given table
  * @client: The postgres client
@@ -14,15 +43,22 @@ export function read(client: any, tableName: string, id: number): object{
       if(err)
          console.log(err);
       else
-         console.log(res.rows);
+         console.log(res);
    });
    //TODO: Create Data Model Object
    return {};
 }
 
-export function update(client: any, tableName: string, id: number, columnNames: Array<string>, columnValues: Array<any>): number{
+/*
+ * Updates an entry in the database
+ * @client: The postgres client
+ * @id: The ID of the entry to be targeted
+ * @model: The data model object to be updated in the database
+ * Return: 0 on success, -1 on failure
+ */
+export function update(client: any, id: number, model: object): number{
    //TODO
-   return 1;
+   return 0;
 }
 
 /*
@@ -30,7 +66,7 @@ export function update(client: any, tableName: string, id: number, columnNames: 
  * @client: The postgres client
  * @tableName: The name of the table to make a query in
  * @id: The ID of the entry to be targeted
- * Return: 1 on success, 0 on failure
+ * Return: 0 on success, -1 on failure
  */
 export function remove(client: any, tableName: string, id: number): number{
    const queryParams: object = {
@@ -40,12 +76,12 @@ export function remove(client: any, tableName: string, id: number): number{
    client.query(queryParams, (err: any, res: any) =>{
       if(err){
          console.log(err);
-         return 0;
+         return -1;
       }else{
          console.log(res.rows);
       }
             
    });
-   return 1;
+   return 0;
 }
 

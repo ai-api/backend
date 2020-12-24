@@ -1,5 +1,6 @@
 import { Client } from 'pg';
-import Package from './data_models/package'
+import TableNames from './enums/tableNames';
+import Package from './data_models/package';
 
 /*
  * SQL queries with parameters require a string which says
@@ -7,7 +8,7 @@ import Package from './data_models/package'
  * @numParams: The number of parameters in the SQL query
  */
 function getIndicesString(numParams: number): string{
-   var result: Array<string> = [];
+   const result: Array<string> = [];
    for(let i = 1; i <= numParams; i++)
       result.push(`$${i}`);
    return result.join();
@@ -17,11 +18,10 @@ function getIndicesString(numParams: number): string{
  * Gets the current date
  * Return: the date in MM/DD/YYYY format
  */
-function getDate(): string{
-   var date = new Date();
-   var dd = String(date.getDate()).padStart(2, '0');
-   var mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0
-   var yyyy = date.getFullYear();
+function getDate(date: Date): string{
+   const dd = String(date.getDate()).padStart(2, '0');
+   const mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0
+   const yyyy = date.getFullYear();
    return mm + '/' + dd + '/' + yyyy;
 }
 
@@ -29,57 +29,53 @@ function getDate(): string{
  * Creates a new package entry in the package table
  * @client: The postgres client
  * @model: The data model object to be updated in the database
- * Return: 0 on successful insertion, -1 otherwise
+ * Return: ID of entry on successful insertion, -1 otherwise
  */
-export function createPackage(client: any, model: Package): number{
+export async function createPackage(client: any, model: Package): Promise<number>{
    //TODO: make sure package name is not taken
-   let tableName: string = 'package';
-   let date: string = getDate();
-   let columnNames: Array<string> = ['userId','lastUpdated','numApiCalls','name',
+   //TODO: store flag entries in package-flag table
+   const tableName = TableNames.PACKAGE;
+   const date: Date = new Date();
+   const columnNames: Array<string> = ['userId','lastUpdated','numApiCalls','name',
       'category', 'description', 'input', 'output', 'markdown'];
-   let columnValues: Array<unknown> = [model.userId, date, 0, model.name,
+   console.log('DATE: ',date);
+   const columnValues: Array<unknown> = [model.userId, date, model.numApiCalls, model.name,
       model.category, model.description, model.input, model.output, model.markdown];
-   let valueIndices: string = getIndicesString(columnValues.length);
-   // Specify query command and parameters
-   let queryParams: object = {
-      text: `INSERT INTO ${tableName}(${columnNames.join()}) VALUES(${valueIndices})`,
-      values: columnValues
+   const valueIndices: string = getIndicesString(columnValues.length);
+   
+   try{
+      // Specify query command and parameters
+      const queryParams = {
+         text: `INSERT INTO ${tableName}(${columnNames.join()}) VALUES(${valueIndices}) RETURNING id`,
+         values: columnValues
+      };
+      console.log('QUERYPARAMS: ', queryParams);
+      const res = await client.query(queryParams);
+      console.log('createPackage RESULT: ', res);
+      // Return the ID of the new entry
+      return res.rows[0].id;
+   }catch(err){
+      console.log('ERROR: createPackage Failed. ' + err);
+      return -1;
    }
-   // Insert the new package entry
-   client.query(queryParams, (err: any, res: any) =>{
-      if(err){
-         console.log(err);
-         return -1
-      }else{
-         console.log(res);
-      }
-   });
-   //TODO: Create respective flag-package entries in the flag_package table
-   return 0;
 }
 
 /*
  * Reads the package entry of a given id
  * @client: The postgres client
  * @id: The ID of the package to be read
- * Return: A valid package object, null otherwise
+ * Return: A promise which resolves to a valid package object or null otherwise
  */
-export function readPackage(client: any, id: number): Package | null{
-   let queryParams: object = {
-      text: `SELECT * FROM package WHERE id = $1`,
-      values: [id]
-   };
-   client.query(queryParams) 
-      .then((res:any)=>{
-         console.log(res.rows[0]);
-         return new Package(res.userId, res.name, res.category, res.description,
-            res.input, res.output, ['placeholderFlags'])
-      })
-      .catch((err:any) =>{
-         console.log('ERROR: Table item could not be read',err);
-         return null;
-      });
-   //TODO: get flags from flag-package table
+export async function readPackage(client: any, id: number): Promise<Package|null>{
+   //TODO: get flags from flag-package table asynchronously
+   const tableName = TableNames.PACKAGE;
+   const data = await read(client, tableName, id);
+   console.log('READ DATA:', data);
+   //Make sure data object is not null
+   if(data){
+      return new Package(data.userid, data.name, data.category, data.description, data.input,
+         data.output, undefined, data.id, data.lastupdated, data.numapicalls, data.markdown);
+   }
    return null;
 }
 
@@ -88,22 +84,20 @@ export function readPackage(client: any, id: number): Package | null{
  * @client: The postgres client
  * @tableName: The name of the table to make a query in
  * @id: The ID of the entry to be targeted
- * Return:
+ * Return: A promise which resolves to a valid SQL query object or null otherwise
  */
 export async function read(client: any, tableName: string, id: number): Promise<any|null>{
-   let queryParams: object = {
+   const queryParams = {
       text: `SELECT * FROM ${tableName} WHERE id = $1`,
       values: [id]
    };
-   await client.query(queryParams) 
-      .then((res:any)=>{
-         console.log(res.rows[0]);
-         return res.rows[0]
-      })
-      .catch((err:any) =>{
-         console.log('ERROR: Table item could not be read',err);
-         return null;
-      });  
+   try{
+      const res = await client.query(queryParams);
+      return res.rows[0];
+   }catch(err){
+      console.log('ERROR: read Failed. ' + err);
+      return null;
+   }
 }
 
 /*
@@ -113,7 +107,7 @@ export async function read(client: any, tableName: string, id: number): Promise<
  * @model: The data model object to be updated in the database
  * Return: 0 on success, -1 on failure
  */
-export function update(client: any, id: number, model: object): number{
+export function update(client: any, id: number, model: any): number{
    //TODO
    return 0;
 }
@@ -126,7 +120,7 @@ export function update(client: any, id: number, model: object): number{
  * Return: 0 on success, -1 on failure
  */
 export function remove(client: any, tableName: string, id: number): number{
-   const queryParams: object = {
+   const queryParams = {
       text: `DELETE * FROM ${tableName} WHERE id = $1`,
       values: [id]
    };

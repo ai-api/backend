@@ -49,7 +49,7 @@ client.connect()
    });
 
 /* Run SQL script to initialize database tables */
-var initDbSql = fs.readFileSync('src/db/loadTables.sql').toString();
+const initDbSql = fs.readFileSync('src/db/loadTables.sql').toString();
 client.query(initDbSql, function(err){
    if(err)
       console.log('ERROR: Could not successfully load tables', err);

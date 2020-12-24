@@ -1,9 +1,17 @@
 import express from 'express';
 import { celebrate, Joi, Segments } from 'celebrate';
 import regexTokens from '../config/regexTokens';
+import { AuthService } from '../services/subjects/authService';
 
+/////////////////////////////////////////////
+////////////////// CONFIG ///////////////////
+/////////////////////////////////////////////
 const router = express.Router();
+const authService = AuthService.getInstance();
 
+/////////////////////////////////////////////
+////////////////// ROUTES ///////////////////
+/////////////////////////////////////////////
 /**
  * Description. Logs the user in by generating
  * a refresh token, and returning it in the
@@ -19,6 +27,11 @@ router.post('/', celebrate({
       password: Joi.string().regex(regexTokens.password).required()
    }).unknown(), 
 }) , (req,res) => {
+
+   console.log(authService.genRefreshToken());
+
+
+
    res.json('TODO: Not yet implemented');
 });
 
@@ -68,3 +81,16 @@ router.delete('/', celebrate({
  * in app.ts
  */
 export default router;
+
+
+
+/////////////////////////////////////////////
+/////////////// TEMP/TESTING ////////////////
+/////////////////////////////////////////////
+const users = new Map<string, any>();
+const user = {
+   id: 1,
+   name: 'user',
+   password: 'Password1'
+};
+users.set(user.name, user);

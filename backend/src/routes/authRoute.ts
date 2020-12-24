@@ -26,13 +26,21 @@ router.post('/', celebrate({
       username: Joi.string().regex(regexTokens.username).required(),
       password: Joi.string().regex(regexTokens.password).required()
    }).unknown(), 
-}) , (req,res) => {
-
-   console.log(authService.genRefreshToken());
-
-
-
-   res.json('TODO: Not yet implemented');
+}) ,(req,res) => {
+   const username = req.body.username;
+   const password = req.body.password;
+  
+   authService.login(username, password)
+   .then((refreshToken) => {
+      res.status(200).json({
+         'refreshToken': refreshToken
+      });
+   })
+   .catch((err) => {
+      res.status(401).json({
+         'Error': err.message
+      });
+   });
 });
 
 /**
@@ -83,14 +91,3 @@ router.delete('/', celebrate({
 export default router;
 
 
-
-/////////////////////////////////////////////
-/////////////// TEMP/TESTING ////////////////
-/////////////////////////////////////////////
-const users = new Map<string, any>();
-const user = {
-   id: 1,
-   name: 'user',
-   password: 'Password1'
-};
-users.set(user.name, user);

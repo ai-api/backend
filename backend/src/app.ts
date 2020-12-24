@@ -48,12 +48,12 @@ client.connect()
       console.log(err);
    });
 
-/* Run SQL script to initialize database tables */
-const initDbSql = fs.readFileSync('src/db/loadTables.sql').toString();
-client.query(initDbSql, function(err){
-   if(err)
-      console.log('ERROR: Could not successfully load tables', err);
-});
+/* Run SQL script to initialize database tables */ //TODO: uncomment back later
+// const initDbSql = fs.readFileSync('src/db/loadTables.sql').toString(); 
+// client.query(initDbSql, function(err){
+//    if(err)
+//       console.log('ERROR: Could not successfully load tables', err);
+// });
 
 /////////////////////////////////////////////
 ////////////// EXPRESS CONFIG ///////////////

@@ -1,5 +1,5 @@
 import express from 'express';
-import { celebrate, Joi, Segments, errors } from 'celebrate';
+import { celebrate, Joi, Segments } from 'celebrate';
 import regexTokens from '../config/regexTokens';
 
 const router = express.Router();
@@ -44,7 +44,7 @@ router.post('/refresh', celebrate({
    [Segments.BODY]: Joi.object().keys({
       refreshToken: Joi.string().token().required(), // TODO: add regex to make sure token is proper len
    }).unknown(),
-   }), (req,res) => {
+}), (req,res) => {
    res.json('TODO: Not yet implemented');
 });
 

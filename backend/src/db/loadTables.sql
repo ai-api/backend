@@ -14,7 +14,7 @@ CREATE TABLE sys_user (
     password varchar NOT NULL,
     email varchar NOT NULL,
     apiKey varchar NOT NULL,
-    profilePicture bytea
+    profilePicture varchar
 );
 
 /* Create model table */

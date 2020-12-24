@@ -21,7 +21,7 @@ CREATE TABLE sys_user (
 CREATE TABLE package (
     id SERIAL PRIMARY KEY,
     userId int NOT NULL,
-    lastUpdated DATE NOT NULL,
+    lastUpdated TIMESTAMP NOT NULL,
     numApiCalls int ,
     name varchar,
     category varchar,

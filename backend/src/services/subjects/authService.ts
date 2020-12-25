@@ -1,5 +1,13 @@
 import { Subject } from './subject';
 import crypto  from 'crypto';
+import fs from 'fs';
+import generateSecret from 'jose/util/generate_secret';
+import fromKeyLike from 'jose/jwk/from_key_like';
+import parseJwk from 'jose/jwk/parse';
+import CompactEncrypt from 'jose/jwe/compact/encrypt';
+import compactDecrypt from 'jose/jwe/compact/decrypt';
+
+import config from '../../config/config';
 
 /**
  * Description. This class contains all functions that relate to
@@ -38,6 +46,12 @@ export class AuthService extends Subject {
          'logoutFail'
       ];
       super(authEvents);
+
+      /**
+       * Generate the secret key that all JWT's
+       * will be signed and verified with
+       */
+      this.genSecretKey();
    }
 
    /**
@@ -96,10 +110,15 @@ export class AuthService extends Subject {
       return refreshToken;
    }
 
-   public async refresh(token: string): string {
+   public async refresh(token: string): Promise<string> {
 
+      const user = refreshTokens.get(token);
 
-      
+      if (user == undefined) {
+         throw new Error('Refresh Token not found on server');
+      }
+
+      return 'test';
    }
 
 
@@ -117,6 +136,53 @@ export class AuthService extends Subject {
    private genRefreshToken(): string {
       return crypto.randomBytes(64).toString('hex');
    }
+
+   private async genSecretKey(): Promise<void> {
+
+      /**
+       * If the secret.key file already exists and is 
+       * valid, don't do anything and just return
+       */
+      if (fs.existsSync(__dirname + '/../../config/jwk.json')) { //TODO, check correct directory
+         return;
+      }
+      const secret = await generateSecret('A256GCM');
+
+      /**
+       * Create a jwk and store it on a file
+       */
+      const jwk = await fromKeyLike(secret);
+      jwk.alg = config.auth.alg;
+      jwk.use = 'enc';
+      fs.writeFileSync(__dirname + '/../../config/jwk.json', JSON.stringify(jwk));
+
+      // // /**
+      // //  * TESTING
+      // //  */
+      // const privateKey = fs.readFileSync(__dirname + '/../../config/jwk.json');
+
+      // const encoder = new TextEncoder();
+      // const payload = {
+      //    'userid': 1
+      // };
+
+      // const jwe = await new CompactEncrypt(encoder.encode(JSON.stringify(payload)))
+      // .setProtectedHeader({
+      //    alg: 'A256KW', 
+      //    enc: 'A256GCM'
+      // })
+      // .encrypt(await parseJwk(jwk, 'dir'));
+      // console.log(jwe);
+      // const { plaintext, protectedHeader} = await compactDecrypt(jwe, await parseJwk(jwk, 'A256KW'));
+
+      // const decoder = new TextDecoder();
+      // console.log(protectedHeader);
+      // console.log(decoder.decode(plaintext));
+     
+
+    
+   }
+
 }
 
 /////////////////////////////////////////////

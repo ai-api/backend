@@ -11,7 +11,12 @@ interface Config {
       ip: string,
       port: number
    }
-};
+   auth: {
+      alg: string,
+      enc: string
+   }
+}
+
 const dev: Config = {
    'port': '8080',
    'db': {
@@ -24,6 +29,10 @@ const dev: Config = {
    'ts': {
       'ip': 'localhost',
       'port': 7777
+   },
+   'auth': {
+      'alg': 'A256KW',
+      'enc': 'A256GCM'
    }
 };
 const prod: Config = {
@@ -38,6 +47,10 @@ const prod: Config = {
    'ts': {
       'ip': 'ts',
       'port': 8501,
+   },
+   'auth': {
+      'alg': 'A256KW',
+      'enc': 'A256GCM'
    }
 };
 

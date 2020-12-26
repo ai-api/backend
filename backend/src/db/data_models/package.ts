@@ -1,5 +1,5 @@
-import {createPackage} from '../dbOperations';
-
+import {createPackage, updatePackage, remove} from '../dbOperations';
+import TableNames from '../enums/tableNames';
 interface Package {
     id?: number;
     userId: number;
@@ -29,8 +29,8 @@ class Package {
     * @numApiCalls: (Optional) Number of times this package's model was requested. Defaults to 0
     * @markdown: (Optional) markdown file. Defaults to empty string
     */
-   constructor(userId: number, name: string, category: string, description: string, input: string, output: string, 
-      flags: Array<string> = [], id = -1, lastUpdated = new Date(), numApiCalls = 0, markdown = ''){
+   constructor(userId: number, name: string, category: string, description: string, input: string, 
+      output: string, id = -1, lastUpdated = new Date(), numApiCalls = 0, markdown = ''){
       this.id = id;
       this.userId = userId;
       this.lastUpdated = lastUpdated;
@@ -40,7 +40,6 @@ class Package {
       this.description = description;
       this.input = input;
       this.output = output;
-      this.flags = flags;
       this.markdown = markdown;
    }
    /*
@@ -52,14 +51,14 @@ class Package {
    async create(client: any): Promise<number>{
       return await createPackage(client, this);
    }
-   update(){
-      //TODO  
+   async update(client: any): Promise<number>{
+      return await updatePackage(client, this); 
    }
-   delete(){
+   async delete(client: any): Promise<number>{
       if(this.id){
-         // Delete this entry
+         return await remove(client, TableNames.PACKAGE, this.id);
       }
-      //TODO 
+      return -1;
    }
 }
 export default Package;

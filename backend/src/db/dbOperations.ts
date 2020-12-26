@@ -15,6 +15,29 @@ function getIndicesString(numParams: number): string{
 }
 
 /*
+ * Generates a query string to update an entry of a given id at a given table
+ * @model: A data model object to be updated in the database
+ * @tableName: The name of the table to construct the query for
+ */
+function updateById(model: Package, tableName: string): string{
+   if(!model || !model.id)
+      return '';
+   // Setup static beginning of query
+   const query = [`UPDATE ${tableName} SET`];
+   // Create another array storing each set command
+   // and assigning a number value for parameterized query
+   const set: Array<string> = [];
+   Object.keys(model).forEach(function (key, i) {
+      set.push(`${key} = ($${i + 1})`); 
+   });
+   query.push(set.join());
+   // Add the WHERE statement to look up by id
+   query.push(`WHERE id = ${model.id}`);
+   // Return a complete query string
+   return query.join(' ');
+}
+
+/*
  * Gets the current date
  * Return: the date in MM/DD/YYYY format
  */
@@ -74,9 +97,35 @@ export async function readPackage(client: any, id: number): Promise<Package|null
    //Make sure data object is not null
    if(data){
       return new Package(data.userid, data.name, data.category, data.description, data.input,
-         data.output, undefined, data.id, data.lastupdated, data.numapicalls, data.markdown);
+         data.output, data.id, data.lastupdated, data.numapicalls, data.markdown);
    }
    return null;
+}
+
+export async function updatePackage(client: any, model: Package): Promise<number> {
+   //TODO: Update flags in flag table
+   // make sure package is valid and has a valid id
+   if(!model || !model.id)
+      return -1;
+   const tableName = TableNames.PACKAGE;
+   try{
+      // Change lastUpdated field to current date
+      const date: Date = new Date();
+      model.lastUpdated = date;
+      // Specify query command and parameters
+      const queryParams = {
+         text: updateById(model, tableName),
+         values: Object.values(model)
+      };
+      console.log('QUERYPARAMS: ', queryParams);
+      const res = await client.query(queryParams);
+      console.log('createPackage RESULT: ', res);
+      // Return success code
+      return 0;
+   }catch(err){
+      console.log('ERROR: updatePackage Failed. ' + err);
+      return -1;
+   }
 }
 
 /*
@@ -101,38 +150,24 @@ export async function read(client: any, tableName: string, id: number): Promise<
 }
 
 /*
- * Updates an entry in the database
- * @client: The postgres client
- * @id: The ID of the entry to be targeted
- * @model: The data model object to be updated in the database
- * Return: 0 on success, -1 on failure
- */
-export function update(client: any, id: number, model: any): number{
-   //TODO
-   return 0;
-}
-
-/*
  * Deletes an entry of a given id from a given table
  * @client: The postgres client
  * @tableName: The name of the table to make a query in
  * @id: The ID of the entry to be targeted
  * Return: 0 on success, -1 on failure
  */
-export function remove(client: any, tableName: string, id: number): number{
+export async function remove(client: any, tableName: string, id: number): Promise<number>{
    const queryParams = {
-      text: `DELETE * FROM ${tableName} WHERE id = $1`,
+      text: `DELETE FROM ${tableName} WHERE id = $1`,
       values: [id]
    };
-   client.query(queryParams, (err: any, res: any) =>{
-      if(err){
-         console.log(err);
-         return -1;
-      }else{
-         console.log(res.rows);
-      }
-            
-   });
-   return 0;
+   try{
+      // Delete the entry
+      await client.query(queryParams);
+      return 0;
+   }catch(err){
+      console.log('ERROR: remove Failed.', err);
+      return -1;
+   }
 }
 

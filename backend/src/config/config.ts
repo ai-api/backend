@@ -13,7 +13,9 @@ interface Config {
    }
    auth: {
       alg: string,
-      enc: string
+      enc: string,
+      iss: string,
+      aud: string,
    }
 }
 
@@ -32,7 +34,9 @@ const dev: Config = {
    },
    'auth': {
       'alg': 'A256KW',
-      'enc': 'A256GCM'
+      'enc': 'A256GCM',
+      'iss': 'aiapi.app',
+      'aud': 'aiapi.app'
    }
 };
 const prod: Config = {
@@ -50,7 +54,9 @@ const prod: Config = {
    },
    'auth': {
       'alg': 'A256KW',
-      'enc': 'A256GCM'
+      'enc': 'A256GCM',
+      'iss': 'aiapi.app',
+      'aud': 'aiapi.app'
    }
 };
 

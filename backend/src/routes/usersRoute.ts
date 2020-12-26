@@ -42,7 +42,7 @@ router.post('/', celebrate({
  */
 router.get('/', celebrate({
    [Segments.QUERY]: Joi.object().keys({
-      userId: Joi.number().positive().integer().required()
+      userId: Joi.number().positive().integer()
    }).unknown(), 
 }), (req,res) => {
    res.json('TODO: Not yet implemented');

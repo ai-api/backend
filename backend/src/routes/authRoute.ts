@@ -31,16 +31,16 @@ router.post('/', celebrate({
    const password = req.body.password;
   
    authService.login(username, password)
-   .then((refreshToken) => {
-      res.status(200).json({
-         'refreshToken': refreshToken
+      .then((refreshToken) => {
+         res.status(200).json({
+            'refreshToken': refreshToken
+         });
+      })
+      .catch((err) => {
+         res.status(401).json({
+            'Error': err.message
+         });
       });
-   })
-   .catch((err) => {
-      res.status(401).json({
-         'Error': err.message
-      });
-   });
 });
 
 /**
@@ -65,8 +65,21 @@ router.post('/refresh', celebrate({
    [Segments.BODY]: Joi.object().keys({
       refreshToken: Joi.string().token().required(), // TODO: add regex to make sure token is proper len
    }).unknown(),
-}), (req,res) => {
-   res.json('TODO: Not yet implemented');
+}), async (req,res) => {
+   const refreshToken = req.body.refreshToken;
+   authService.refresh(refreshToken)
+      .then((jwt: string) => {
+         res.status(200).json({
+            'jwt': jwt
+         });
+      })
+      .catch((err: Error) => {
+         res.status(401).json({
+            'Error': err.message
+         });
+         return;
+      });   
+
 });
 
 /**

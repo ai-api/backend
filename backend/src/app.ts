@@ -8,6 +8,9 @@ import bodyParser from 'body-parser';
 import authRouter from './routes/authRoute';
 import usersRouter from './routes/usersRoute';
 import dbTestRouter from './routes/dbTestRoute';
+
+import { authMiddleware } from './middleware/authMiddleware';
+
 /* Init express */
 const app = express();
 /////////////////////////////////////////////
@@ -17,9 +20,12 @@ const app = express();
 /* bodyParser is req'd to process json body */
 app.use(bodyParser.json());
 
-/* Handles all requests to /auth */
+/* Add auth middleware */
+app.use(authMiddleware);
+
+/* Add all routers to app */
 app.use('/auth', authRouter);
-//app.use('/users/', usersRouter);
+app.use('/users/', usersRouter);
 
 /* Used to debug/test database operations */
 app.use('/dbTest/', dbTestRouter);

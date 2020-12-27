@@ -11,7 +11,6 @@ interface Package {
     input: string;
     output: string;
     markdown?: string;
-    flags: Array<string>;
 }
 
 class Package {
@@ -22,8 +21,6 @@ class Package {
     * @description: A short description of the package
     * @input: An example input for the AI model
     * @output: The output of the example input
-    * @flags: (Optional) An array of the different flags associated with the package.
-    * Defaults to an empty array
     * @id: (Optional) The table id of the package. Defaults to -1
     * @lastUpdated: (Optional) Date of the last update to the package. Defaults to empty string
     * @numApiCalls: (Optional) Number of times this package's model was requested. Defaults to 0

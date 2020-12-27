@@ -19,7 +19,7 @@ function getIndicesString(numParams: number): string{
  * @model: A data model object to be updated in the database
  * @tableName: The name of the table to construct the query for
  */
-function updateById(model: Package, tableName: string): string{
+function updateById(model: any, tableName: string): string{
    if(!model || !model.id)
       return '';
    // Setup static beginning of query
@@ -54,9 +54,10 @@ function getDate(date: Date): string{
  * @model: The data model object to be updated in the database
  * Return: ID of entry on successful insertion, -1 otherwise
  */
-export async function createPackage(client: any, model: Package): Promise<number>{
+export async function createPackage(client: Client, model: Package): Promise<number>{
    //TODO: make sure package name is not taken
    //TODO: store flag entries in package-flag table
+   console.log('TYPE OF MODEL:', client.constructor.name);
    const tableName = TableNames.PACKAGE;
    const date: Date = new Date();
    const columnNames: Array<string> = ['userId','lastUpdated','numApiCalls','name',
@@ -89,7 +90,7 @@ export async function createPackage(client: any, model: Package): Promise<number
  * @id: The ID of the package to be read
  * Return: A promise which resolves to a valid package object or null otherwise
  */
-export async function readPackage(client: any, id: number): Promise<Package|null>{
+export async function readPackage(client: Client, id: number): Promise<Package|null>{
    //TODO: get flags from flag-package table asynchronously
    const tableName = TableNames.PACKAGE;
    const data = await read(client, tableName, id);
@@ -102,7 +103,7 @@ export async function readPackage(client: any, id: number): Promise<Package|null
    return null;
 }
 
-export async function updatePackage(client: any, model: Package): Promise<number> {
+export async function updatePackage(client: Client, model: Package): Promise<number> {
    //TODO: Update flags in flag table
    // make sure package is valid and has a valid id
    if(!model || !model.id)
@@ -135,7 +136,7 @@ export async function updatePackage(client: any, model: Package): Promise<number
  * @id: The ID of the entry to be targeted
  * Return: A promise which resolves to a valid SQL query object or null otherwise
  */
-export async function read(client: any, tableName: string, id: number): Promise<any|null>{
+export async function read(client: Client, tableName: string, id: number): Promise<any|null>{
    const queryParams = {
       text: `SELECT * FROM ${tableName} WHERE id = $1`,
       values: [id]
@@ -156,7 +157,7 @@ export async function read(client: any, tableName: string, id: number): Promise<
  * @id: The ID of the entry to be targeted
  * Return: 0 on success, -1 on failure
  */
-export async function remove(client: any, tableName: string, id: number): Promise<number>{
+export async function remove(client: Client, tableName: string, id: number): Promise<number>{
    const queryParams = {
       text: `DELETE FROM ${tableName} WHERE id = $1`,
       values: [id]

@@ -4,11 +4,9 @@ import fs from 'fs';
 import express from 'express';
 import config from './config/config';
 import bodyParser from 'body-parser';
-
 import authRouter from './routes/authRoute';
 import usersRouter from './routes/usersRoute';
 import dbTestRouter from './routes/dbTestRoute';
-
 import { authMiddleware } from './middleware/authMiddleware';
 
 /* Init express */

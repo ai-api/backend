@@ -3,14 +3,11 @@ import { celebrate, Joi, Segments } from 'celebrate';
 import regexTokens from '../config/regexTokens';
 import { UserService } from '../services/subjects/userService';
 
-
 /////////////////////////////////////////////
 /////////////// ROUTE CONFIG ////////////////
 /////////////////////////////////////////////
 
 const userService = UserService.getInstance();
-
-
 const router = express.Router();
 /////////////////////////////////////////////
 ////////////////// ROUTES ///////////////////

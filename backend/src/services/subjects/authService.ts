@@ -1,13 +1,11 @@
 import { Subject } from './subject';
 import crypto  from 'crypto';
 import fs from 'fs';
-
 import generateSecret from 'jose/util/generate_secret';
 import fromKeyLike, { JWK } from 'jose/jwk/from_key_like';
 import parseJwk from 'jose/jwk/parse';
 import EncryptJWT from 'jose/jwt/encrypt';
 import jwtDecrypt from 'jose/jwt/decrypt';
-
 import config from '../../config/config';
 
 /**
@@ -18,7 +16,7 @@ import config from '../../config/config';
 export class AuthService extends Subject {
 
    /**
-    * @instance stores the glocal instance of the userService
+    * @instance stores the global instance of the userService
     * @jwk is the current jwk that encrypts and authorizes all
     * jwt's
     */
@@ -35,12 +33,7 @@ export class AuthService extends Subject {
     */
    private constructor() {
       super(authEvents);
-
-      /**
-       * Generate the secret key that all JWT's
-       * will be signed and verified with
-       */
-      this.genSecretKey();
+      this.genJwk();
    }
 
    /**
@@ -54,7 +47,6 @@ export class AuthService extends Subject {
       }
       return AuthService.instance;
    }
-
    ///////////////////////////////////////////////////////////////////////////
    ///////////////////////////// PUBLIC METHODS //////////////////////////////
    ///////////////////////////////////////////////////////////////////////////
@@ -83,28 +75,15 @@ export class AuthService extends Subject {
     */
    public async login(username: string, password: string): Promise<string> {
 
-      /**
-       * Grab user based on username. If username 
-       * doesn't exist, throw error
-       */
       const user = users.get(username);
       if (!user) {
          this.notify('loginFail', user);
          throw new Error('Invalid Username');
       }
-   
-      /**
-       * Check if valid password. If not, throw error
-       */
       if (user.password != password) {
          this.notify('loginFail', user);
          throw new Error('Invalid Password');
       }
-
-      /**
-       * If username & password are both correct, 
-       * generate & store refresh token and return it
-       */
       const refreshToken = this.genRefreshToken();
       refreshTokens.set(refreshToken, user.id);
       return refreshToken;
@@ -118,21 +97,12 @@ export class AuthService extends Subject {
     */
    public async refresh(token: string): Promise<string> {
 
-      /**
-       * Check that refreshToken exists, and grab 
-       * the user's userId. If it doesn't throw
-       * appropriate error
-       */
       const userId = refreshTokens.get(token);
       if (userId == undefined) {
          this.notify('refreshFail', user); // TODO: Properly grab user object
          throw new Error('Refresh Token not found on server');
       }
 
-      /**
-       * Create a jwt payload that contains the
-       * user's userId
-       */
       const payload = {
          'userId': userId
       };
@@ -147,11 +117,9 @@ export class AuthService extends Subject {
          .setExpirationTime('2h')
          .encrypt(await parseJwk(this.jwk));
 
-
       this.notify('refreshSuccess', user); // TODO: Properly grab user object
       return jwt;
    }
-
 
    ///////////////////////////////////////////////////////////////////////////
    ///////////////////////// PRIVATE HELPER METHODS //////////////////////////
@@ -168,29 +136,26 @@ export class AuthService extends Subject {
       return crypto.randomBytes(64).toString('hex');
    }
 
-   private async genSecretKey(): Promise<void> {
+   /**
+    * Description. Checks if the file jwk.json exists
+    * in /src/config/ and if not, generates the file.
+    * Then, sets this.jwk to the contents of jwk.json
+    */
+   private async genJwk(): Promise<void> {
+      let jwk: JWK;
 
-      /**
-       * If the secret.key file already exists and is 
-       * valid, read it from the file and set this.jwk
-       */
       if (fs.existsSync(__dirname + '/../../config/jwk.json')) {
-         this.jwk = JSON.parse(fs.readFileSync(__dirname + '/../../config/jwk.json').toString());
-         return;
+         jwk = JSON.parse(fs.readFileSync(__dirname + '/../../config/jwk.json').toString());
+      } 
+      else {
+         const secret = await generateSecret('A256GCM');
+         jwk = await fromKeyLike(secret);
+         jwk.kid = 'Auth Key';
+         jwk.alg = config.auth.alg;
+         jwk.use = 'enc';
+         fs.writeFileSync(__dirname + '/../../config/jwk.json', JSON.stringify(jwk));
       }
-
-      /**
-       * Else, create a jwk and store it on a file,
-       * and set this.jwk
-       */
-      const secret = await generateSecret('A256GCM');
-      const jwk = await fromKeyLike(secret);
-      jwk.kid = 'Auth Key';
-      jwk.alg = config.auth.alg;
-      jwk.use = 'enc';
       this.jwk = jwk;
-      fs.writeFileSync(__dirname + '/../../config/jwk.json', JSON.stringify(jwk));
-      return;
    }
 }
 
@@ -208,12 +173,10 @@ const authEvents = [
    'logoutSuccess',
    'logoutFail'
 ];
-
-
-
 /////////////////////////////////////////////
 /////////////// TEMP/TESTING ////////////////
 /////////////////////////////////////////////
+
 const users = new Map<string, any>();
 const user = {
    id: 1,

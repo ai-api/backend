@@ -12,21 +12,23 @@ const noAuthRoutes = [
    '/auth/refresh'
 ];
 
+/**
+ * Description. The following function is intended to be used as 
+ * middleware within express. It checks if the route requires 
+ * authentication. If it does, it grabs the jwt from the header,
+ * and formats it properly. If the jwt isn't in the header, a 401
+ * status is returned. If the jwt is in the header, we then check 
+ * if its autheorized.
+ * @param req The current request
+ * @param res The current response
+ * @param next The next middleware function express will call
+ */
 export const authMiddleware = async (req: express.Request , res: express.Response, next: express.NextFunction): Promise<void> => {
 
-   /**
-    * Check if route requires authentication.
-    * If not, just call next() immediately
-    */
    if (noAuthRoutes.includes(req.url)) {
       next();
       return;
    }
-
-   /**
-    * Grab the jwt from the header, format the jwt properly,
-    * and if it doesn't exist, then send status 401 and return
-    */
    const jwtString = req.headers.authorization;
    const jwt = jwtString?.replace('Bearer ', '');
    if (jwt === undefined) {
@@ -35,10 +37,6 @@ export const authMiddleware = async (req: express.Request , res: express.Respons
       });
       return;
    }
-
-   /**
-    * Check if jwt is valid. If not, return 401 unauthorized
-    */
    try {
       req.userId = await AuthService.getInstance().authorize(jwt);
    }

@@ -2,11 +2,6 @@ import { PoolClient } from 'pg';
 import {dbCreate, dbReadById, dbUpdate, dbRemove} from '../dbOperations';
 import TableNames from '../enums/tableNames';
 class Package {
-   // TODO: write static get and create functions
-   // TODO: combine create and update functions into a save function
-   // TODO: Find way to keep tack of fields that need to be updated
-   // TODO: Pass client into constructor
-   // TODO: save category as category id rather than string
    private client: PoolClient;
    private tableName: string;
    private id: number;
@@ -19,6 +14,7 @@ class Package {
    private input: string;
    private output: string;
    private markdown: string;
+   private updatedFields: Set<string>;
    /*
     * @userId: The user's unique ID number
     * @name: The name of the package
@@ -45,9 +41,10 @@ class Package {
       this.markdown = markdown;
       this.client = client;
       this.tableName = TableNames.PACKAGE;
+      this.updatedFields = new Set();
    }
 
-   public static async readInstance(client: PoolClient, id:number): Promise<Package|null>{
+   public static async getInstance(client: PoolClient, id:number): Promise<Package|null>{
       const data = await dbReadById(client, TableNames.PACKAGE, id);
       if(data)
          return new Package(client, data.userid, data.name, data.category, data.description, data.input,
@@ -72,21 +69,36 @@ class Package {
     * Creates a new package entry in the package table using
     * the fields in the current object
     * @param client The postgres client object
-    * Return: None
+    * @returns 
     */
    private async insert(): Promise<number>{
-      return 0;
+      this.setLastUpdated();
+      const columnNames: Array<string> = ['userId', 'lastUpdated','numApiCalls','name',
+         'category', 'description', 'input', 'output', 'markdown'];
+      const columnValues: Array<unknown> = [ this.userId, this.lastUpdated, this.numApiCalls, this.name,
+         this.category, this.description, this.input, this.output, this.markdown];
+      return await dbCreate(this.client, this.tableName, columnNames, columnValues);
    }
+
    private async update(): Promise<number>{
-      return 0;
+      if(this.updatedFields.size == 0)
+         return 0;
+      this.setLastUpdated();
+      const columnNames: Array<string> = [];
+      const columnValues: Array<unknown> = [];
+      this.updatedFields.forEach(fieldName =>{
+         columnNames.push(fieldName);
+         columnValues.push(this[fieldName as keyof Package]);
+      });
+      return await dbUpdate(this.client, this.tableName, columnNames, columnValues, this.id);
    }
+
    public async delete(): Promise<number>{
       if(this.id){
          return await dbRemove(this.client, this.tableName, this.id);
       }
       return -1;
    }
-
    
    public getId(): number{
       return this.id;
@@ -99,6 +111,7 @@ class Package {
    public setUserId(newId: number): number{
       if(newId >= 1){
          this.userId = newId;
+         this.updatedFields.add('userId');
          return 0;
       }
       return -1;
@@ -106,6 +119,11 @@ class Package {
 
    public getLastUpdated(): Date{
       return this.lastUpdated;
+   }
+
+   private setLastUpdated(): void{
+      this.lastUpdated = new Date();
+      this.updatedFields.add('lastUpdated');
    }
 
    public getNumApiCalls(): number{
@@ -119,6 +137,7 @@ class Package {
    public setName(newName: string): number{
       if(newName){
          this.name = newName;
+         this.updatedFields.add('name');
          return 0;
       }
       return -1; 
@@ -140,6 +159,7 @@ class Package {
    public setDescription(newDescription: string): number{
       if(newDescription){
          this.description = newDescription;
+         this.updatedFields.add('description');
          return 0;
       }
       return -1;
@@ -152,6 +172,7 @@ class Package {
    public setInput(newInput: string): number{
       if(newInput){
          this.input = newInput;
+         this.updatedFields.add('input');
          return 0;
       }
       return -1;
@@ -164,6 +185,7 @@ class Package {
    public setOutput(newOutput: string): number{
       if(newOutput){
          this.output = newOutput;
+         this.updatedFields.add('output');
          return 0;
       }
       return -1;
@@ -176,21 +198,11 @@ class Package {
    public setMarkdown(newMarkdown:string): number{
       if(newMarkdown){
          this.markdown = newMarkdown;
+         this.updatedFields.add('markdown');
          return 0;
       }
       return -1;
    }
 }
-// private client: PoolClient;
-// private tableName: string;
-// private id?: number;
-// private userId: number;
-// private lastUpdated?: Date;
-// private numApiCalls?: number;
-// private name: string;
-// private category: string;
-// private description: string;
-// private input: string;
-// private output: string;
-// private markdown?: string;
+
 export default Package;

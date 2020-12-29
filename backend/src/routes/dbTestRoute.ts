@@ -3,8 +3,6 @@ import Package from '../db/data_models/package';
 import { Client, Pool } from 'pg';
 import config from '../config/config';
 
-import {readPackage} from '../db/dbOperations';
-
 const router = express.Router();
 
 /* Create a postgres pool*/
@@ -51,10 +49,10 @@ router.get('/createPackage',(req, res, next)=>{
          console.log(err);
       } 
       // Create test package object
-      const testPackage: Package = new Package(1, 'name', 'category', 'description', 'inputs', 'ouputs');
+      const testPackage: Package = Package.createInstance(client, 1, 'name', 1, 'description', 'input', 'output', 'markdown');
       console.log(testPackage);
       // Insert package object into package table
-      testPackage.create(client)
+      testPackage.save()
          .then(id=>{
             // Release the client resource
             client.release();
@@ -74,13 +72,15 @@ router.get('/readPackage',(req, res, next)=>{
       } 
       // initialize a package object
       const id = 14;
-      readPackage(client, id)
+      Package.getInstance(client, id)
          .then(resultPackage =>{
-            // Release the client resource
             client.release();
             res.json(JSON.stringify(resultPackage));
+         })
+         .catch(err=>{
+            client.release();
+            res.json(err);
          });
-      
    });
 });
 
@@ -93,13 +93,24 @@ router.get('/updatePackage',(req, res, next)=>{
          client.release();
          console.log(err);
       } 
-      // Create test package object
-      const testPackage: Package = new Package(1, 'UPDATED', 'category', 'description', 'inputs', 'ouputs', 14);
-      testPackage.update(client)
-         .then(resultPackage =>{
-            // Release the client resource
-            client.release();
-            res.json(JSON.stringify(resultPackage));
+ 
+      // initialize a package object
+      const id = 14;
+      Package.getInstance(client, id)
+         .then(testPackage =>{
+            testPackage.setCategory(2);
+            testPackage.setDescription('new description');
+            testPackage.setInput('new input');
+            testPackage.setOutput('new output');
+            testPackage.setMarkdown('new markdown');
+            testPackage.setName('new name');
+            testPackage.setUserId(99);
+            testPackage.save()
+               .then(() =>{
+                  // Release the client resource
+                  client.release();
+                  res.json(`Package ${id} Updated Successfully`);
+               });
          });
    });
 });
@@ -113,13 +124,15 @@ router.get('/deletePackage',(req, res, next)=>{
          client.release();
          console.log(err);
       } 
-      // Create test package object
-      const testPackage: Package = new Package(1, 'UPDATED', 'category', 'description', 'inputs', 'ouputs', 14);
-      testPackage.delete(client)
-         .then(resultPackage =>{
-            // Release the client resource
-            client.release();
-            res.json(JSON.stringify(resultPackage));
+      const id = 14;
+      Package.getInstance(client, id)
+         .then(testPackage =>{
+            testPackage.delete()
+               .then(() =>{
+                  // Release the client resource
+                  client.release();
+                  res.json(`Package ${id} Successfully Deleted`);
+               });
          });
    });
 });

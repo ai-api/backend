@@ -27,7 +27,7 @@ class Package {
     * @numApiCalls: (Optional) Number of times this package's model was requested. Defaults to 0
     * @markdown: (Optional) markdown file. Defaults to empty string
     */
-   constructor(client: PoolClient, userId: number, name: string, category: number, description: string, input: string, 
+   private constructor(client: PoolClient, userId: number, name: string, category: number, description: string, input: string, 
       output: string, markdown = '', id = -1, lastUpdated = new Date(), numApiCalls = 0){
       this.id = id;
       this.userId = userId;
@@ -44,26 +44,26 @@ class Package {
       this.updatedFields = new Set();
    }
 
-   public static async getInstance(client: PoolClient, id:number): Promise<Package|null>{
+   public static async getInstance(client: PoolClient, id:number): Promise<Package>{
       const data = await dbReadById(client, TableNames.PACKAGE, id);
       if(data)
          return new Package(client, data.userid, data.name, data.category, data.description, data.input,
             data.output, data.markdown, data.id, data.lastupdated, data.numapicalls);
-      return null;
+      throw 'Package information could not be retrieved from database';
    }
 
    public static createInstance(client: PoolClient, userId: number, name: string, category: number, description: string, 
-      input: string, output: string, markdown = ''): Package|null{
+      input: string, output: string, markdown = ''): Package{
 
       if(client && userId && name && category && description && input && output)
          return new Package(client, userId, name, category, description, input, output, markdown);
-      return null;
+      throw 'One or more invalid method arguments';
    }
 
    public async save(): Promise<number>{
-      if(this.id)
+      if(this.id >= 1)
          return await this.update();
-      return await this.insert();
+      return await this.create();
    }
    /**
     * Creates a new package entry in the package table using
@@ -71,7 +71,8 @@ class Package {
     * @param client The postgres client object
     * @returns 
     */
-   private async insert(): Promise<number>{
+   private async create(): Promise<number>{
+      console.log('CREATING NEW PACKAGE');
       this.setLastUpdated();
       const columnNames: Array<string> = ['userId', 'lastUpdated','numApiCalls','name',
          'category', 'description', 'input', 'output', 'markdown'];
@@ -81,6 +82,7 @@ class Package {
    }
 
    private async update(): Promise<number>{
+      console.log('UPDATING EXISTING PACKAGE');
       if(this.updatedFields.size == 0)
          return 0;
       this.setLastUpdated();
@@ -94,7 +96,7 @@ class Package {
    }
 
    public async delete(): Promise<number>{
-      if(this.id){
+      if(this.id >= 1){
          return await dbRemove(this.client, this.tableName, this.id);
       }
       return -1;
@@ -143,13 +145,18 @@ class Package {
       return -1; 
    }
 
-   public getCategory(): string{
-      return 'TODO';
+   public getCategory(): number{
+      return this.category;
    }
 
-   public setCategory(): number{
+   public setCategory(newCategory: number): number{
       //TODO
-      return 0;
+      if(newCategory >= 1){
+         this.category = newCategory;
+         this.updatedFields.add('category');
+         return 0;
+      }
+      return -1;
    }
 
    public getDescription(): string{

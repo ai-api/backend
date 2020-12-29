@@ -44,7 +44,14 @@ class Package {
       this.updatedFields = new Set();
    }
 
-   public static async getInstance(client: PoolClient, id:number): Promise<Package>{
+   /**
+    * Initialized and returns a Package object using information from
+    * an entry in the database with the given id
+    * @param client A postgres client object retrieved from a pool
+    * @param id The ID of the package in the database table
+    * @return A promise which resolves to a package object
+    */
+   public static async getInstance(client: PoolClient, id: number): Promise<Package>{
       const data = await dbReadById(client, TableNames.PACKAGE, id);
       if(data)
          return new Package(client, data.userid, data.name, data.category, data.description, data.input,
@@ -52,6 +59,19 @@ class Package {
       throw 'Package information could not be retrieved from database';
    }
 
+   /**
+    * Initialized and returns a new Package object using information 
+    * provided by the user
+    * @param client A postgres client object retrieved from a pool
+    * @param userId The package creator's ID
+    * @param name The name of the package
+    * @param category The ID of the package's category
+    * @param description A short description of the package
+    * @param input An example input for the package model
+    * @param output The output of the given example input
+    * @param markdown A markdown file containing additional information
+    * @return A Package object
+    */
    public static createInstance(client: PoolClient, userId: number, name: string, category: number, description: string, 
       input: string, output: string, markdown = ''): Package{
 
@@ -60,6 +80,13 @@ class Package {
       throw 'One or more invalid method arguments';
    }
 
+   /**
+    * Updates the corresponding Package entry in the database if
+    * one exists, otherwise create a new Package entry in the database
+    * @return A promise which resolves to a number. The package ID
+    * is returned on a successful save, 0 is returned if the postgres
+    * client can't save the object, -1 is returned if an error occurs
+    */
    public async save(): Promise<number>{
       if(this.id >= 1)
          return await this.update();
@@ -68,8 +95,9 @@ class Package {
    /**
     * Creates a new package entry in the package table using
     * the fields in the current object
-    * @param client The postgres client object
-    * @returns 
+    * @return A promise which resolves to a number. The package ID
+    * is returned on a successful insert, 0 is returned if the postgres
+    * client can't insert the object, -1 is returned if an error occurs
     */
    private async create(): Promise<number>{
       console.log('CREATING NEW PACKAGE');
@@ -81,6 +109,13 @@ class Package {
       return await dbCreate(this.client, this.tableName, columnNames, columnValues);
    }
 
+   /**
+    * Updates an existing package entry in teh database using the 
+    * altered fields in the current object
+    * @return A promise which resolves to a number. The package ID
+    * is returned on a successful update, 0 is returned if the postgres
+    * client can't update the object, -1 is returned if an error occurs
+    */
    private async update(): Promise<number>{
       console.log('UPDATING EXISTING PACKAGE');
       if(this.updatedFields.size == 0)
@@ -95,21 +130,40 @@ class Package {
       return await dbUpdate(this.client, this.tableName, columnNames, columnValues, this.id);
    }
 
+   /**
+    * Deletes the package corresponding to this package in the 
+    * database
+    * @return Promise which resolves to 0 for a successful removal
+    * or -1 otherwise
+    */
    public async delete(): Promise<number>{
       if(this.id >= 1){
-         return await dbRemove(this.client, this.tableName, this.id);
+         await dbRemove(this.client, this.tableName, this.id);
+         return 0;
       }
       return -1;
    }
    
+   /**
+    * Gets the ID of the package object
+    * @return ID number of the package
+    */
    public getId(): number{
       return this.id;
    }
 
+   /**
+    * Gets the ID of the user who owns the package
+    * @return ID number of the user
+    */
    public getUserId(): number{
       return this.userId;
    }
 
+   /**
+    * Changes the user ID associated with the package
+    * @return 0 on success, -1 otherwise
+    */
    public setUserId(newId: number): number{
       if(newId >= 1){
          this.userId = newId;
@@ -119,23 +173,43 @@ class Package {
       return -1;
    }
 
+   /**
+    * Gets the date when this package was last updated
+    * @return Date object of last update
+    */
    public getLastUpdated(): Date{
       return this.lastUpdated;
    }
 
+   /**
+    * Changes the date of the last update to the current date
+    */
    private setLastUpdated(): void{
       this.lastUpdated = new Date();
       this.updatedFields.add('lastUpdated');
    }
 
+   /**
+    * Gets the number of times the package model was requested
+    * @return number of API calls made to the package
+    */
    public getNumApiCalls(): number{
       return this.numApiCalls;
    }
 
+   /**
+    * Gets the name of the package
+    * @return name of the package
+    */
    public getName(): string{
       return this.name;
    }
 
+   /**
+    * Changes the name of the package
+    * @param newName The new name to change to
+    * @return -1 if newName is invalid, 0 otherwise
+    */
    public setName(newName: string): number{
       if(newName){
          this.name = newName;
@@ -145,12 +219,20 @@ class Package {
       return -1; 
    }
 
+   /**
+    * Gets the category ID of the package
+    * @returns category ID associated with the package
+    */
    public getCategory(): number{
       return this.category;
    }
 
+   /**
+    * Changes the category ID associated with the package
+    * @param newCategory The new category to change to
+    * @return -1 if newCategory is invalid, 0 otherwise
+    */
    public setCategory(newCategory: number): number{
-      //TODO
       if(newCategory >= 1){
          this.category = newCategory;
          this.updatedFields.add('category');
@@ -159,10 +241,19 @@ class Package {
       return -1;
    }
 
+   /**
+    * Gets the short description of the package
+    * @return package description
+    */
    public getDescription(): string{
       return this.description;
    }
 
+   /**
+    * Changes the description of the package
+    * @param newName The new description to change to
+    * @return -1 if newDescription is invalid, 0 otherwise
+    */
    public setDescription(newDescription: string): number{
       if(newDescription){
          this.description = newDescription;
@@ -172,10 +263,19 @@ class Package {
       return -1;
    }
 
+   /**
+    * Gets the example input of the package model
+    * @returns Example model input
+    */
    public getInput(): string{
       return this.input;
    }
 
+   /**
+    * Changes the input of the package
+    * @param newInput The new input to change to
+    * @return -1 if newInput is invalid, 0 otherwise
+    */
    public setInput(newInput: string): number{
       if(newInput){
          this.input = newInput;
@@ -185,10 +285,19 @@ class Package {
       return -1;
    }
 
+   /**
+    * Gets the example output of the package model
+    * @return Example model output
+    */
    public getOutput(): string{
       return this.output;
    }
 
+   /**
+    * Changes the example output of the package
+    * @param newName The new output to change to
+    * @return -1 if newOutput is invalid, 0 otherwise
+    */
    public setOutput(newOutput: string): number{
       if(newOutput){
          this.output = newOutput;
@@ -198,10 +307,19 @@ class Package {
       return -1;
    }
 
+   /**
+    * Gets the raw markdown of the package
+    * @return package markdown
+    */
    public getMarkdown(): string{
       return this.markdown;
    }
 
+   /**
+    * Changes the mardown of the package
+    * @param newName The new markdown to change to
+    * @return -1 if newMarkdown is invalid, 0 otherwise
+    */
    public setMarkdown(newMarkdown:string): number{
       if(newMarkdown){
          this.markdown = newMarkdown;

@@ -98,13 +98,13 @@ router.get('/updatePackage',(req, res, next)=>{
       const id = 14;
       Package.getInstance(client, id)
          .then(testPackage =>{
-            testPackage.setCategory(2);
-            testPackage.setDescription('new description');
-            testPackage.setInput('new input');
-            testPackage.setOutput('new output');
-            testPackage.setMarkdown('new markdown');
-            testPackage.setName('new name');
-            testPackage.setUserId(99);
+            testPackage.categoryId = 2;
+            testPackage.description = 'new description';
+            testPackage.input = 'new input';
+            testPackage.output = 'new output';
+            testPackage.md = 'new markdown';
+            testPackage.name = 'new name';
+            testPackage.userId = 99;
             testPackage.save()
                .then(() =>{
                   // Release the client resource

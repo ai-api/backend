@@ -4,15 +4,15 @@ import TableNames from '../enums/tableNames';
 class Package {
    private client: PoolClient;
    private tableName: string;
-   private id: number;
-   private userId: number;
+   private sysId: number;
+   private user: number;
    private lastUpdated: Date;
    private numApiCalls: number;
-   private name: string;
+   private packageName: string;
    private category: number;
-   private description: string;
-   private input: string;
-   private output: string;
+   private shortDescription: string;
+   private modelInput: string;
+   private modelOutput: string;
    private markdown: string;
    private updatedFields: Set<string>;
    /*
@@ -29,15 +29,15 @@ class Package {
     */
    private constructor(client: PoolClient, userId: number, name: string, category: number, description: string, input: string, 
       output: string, markdown = '', id = -1, lastUpdated = new Date(), numApiCalls = 0){
-      this.id = id;
-      this.userId = userId;
+      this.sysId = id;
+      this.user = userId;
       this.lastUpdated = lastUpdated;
       this.numApiCalls = numApiCalls;
-      this.name = name;
+      this.packageName = name;
       this.category = category;
-      this.description = description;
-      this.input = input;
-      this.output = output;
+      this.shortDescription = description;
+      this.modelInput = input;
+      this.modelOutput = output;
       this.markdown = markdown;
       this.client = client;
       this.tableName = TableNames.PACKAGE;
@@ -56,7 +56,7 @@ class Package {
       if(data)
          return new Package(client, data.userid, data.name, data.category, data.description, data.input,
             data.output, data.markdown, data.id, data.lastupdated, data.numapicalls);
-      throw 'Package information could not be retrieved from database';
+      throw new Error('Package information could not be retrieved from database');
    }
 
    /**
@@ -77,7 +77,7 @@ class Package {
 
       if(client && userId && name && category && description && input && output)
          return new Package(client, userId, name, category, description, input, output, markdown);
-      throw 'One or more invalid method arguments';
+      throw new Error('One or more invalid method arguments');
    }
 
    /**
@@ -88,7 +88,7 @@ class Package {
     * client can't save the object, -1 is returned if an error occurs
     */
    public async save(): Promise<number>{
-      if(this.id >= 1)
+      if(this.sysId >= 1)
          return await this.update();
       return await this.create();
    }
@@ -104,8 +104,8 @@ class Package {
       this.setLastUpdated();
       const columnNames: Array<string> = ['userId', 'lastUpdated','numApiCalls','name',
          'category', 'description', 'input', 'output', 'markdown'];
-      const columnValues: Array<unknown> = [ this.userId, this.lastUpdated, this.numApiCalls, this.name,
-         this.category, this.description, this.input, this.output, this.markdown];
+      const columnValues: Array<unknown> = [ this.user, this.lastUpdated, this.numApiCalls, this.packageName,
+         this.category, this.shortDescription, this.modelInput, this.modelOutput, this.markdown];
       return await dbCreate(this.client, this.tableName, columnNames, columnValues);
    }
 
@@ -127,7 +127,7 @@ class Package {
          columnNames.push(fieldName);
          columnValues.push(this[fieldName as keyof Package]);
       });
-      return await dbUpdate(this.client, this.tableName, columnNames, columnValues, this.id);
+      return await dbUpdate(this.client, this.tableName, columnNames, columnValues, this.sysId);
    }
 
    /**
@@ -137,8 +137,8 @@ class Package {
     * or -1 otherwise
     */
    public async delete(): Promise<number>{
-      if(this.id >= 1){
-         await dbRemove(this.client, this.tableName, this.id);
+      if(this.sysId >= 1){
+         await dbRemove(this.client, this.tableName, this.sysId);
          return 0;
       }
       return -1;
@@ -148,36 +148,34 @@ class Package {
     * Gets the ID of the package object
     * @return ID number of the package
     */
-   public getId(): number{
-      return this.id;
+   public get idNum(): number{
+      return this.sysId;
    }
 
    /**
     * Gets the ID of the user who owns the package
     * @return ID number of the user
     */
-   public getUserId(): number{
-      return this.userId;
+   public get userId(): number{
+      return this.user;
    }
 
    /**
     * Changes the user ID associated with the package
-    * @return 0 on success, -1 otherwise
     */
-   public setUserId(newId: number): number{
+   public set userId(newId: number){
       if(newId >= 1){
-         this.userId = newId;
+         this.user = newId;
          this.updatedFields.add('userId');
-         return 0;
       }
-      return -1;
+      throw new Error('Invalid ID number');
    }
 
    /**
     * Gets the date when this package was last updated
     * @return Date object of last update
     */
-   public getLastUpdated(): Date{
+   public get dateLastUpdated(): Date{
       return this.lastUpdated;
    }
 
@@ -193,7 +191,7 @@ class Package {
     * Gets the number of times the package model was requested
     * @return number of API calls made to the package
     */
-   public getNumApiCalls(): number{
+   public get apiCalls(): number{
       return this.numApiCalls;
    }
 
@@ -201,29 +199,27 @@ class Package {
     * Gets the name of the package
     * @return name of the package
     */
-   public getName(): string{
-      return this.name;
+   public get name(): string{
+      return this.packageName;
    }
 
    /**
     * Changes the name of the package
     * @param newName The new name to change to
-    * @return -1 if newName is invalid, 0 otherwise
     */
-   public setName(newName: string): number{
+   public set name(newName: string){
       if(newName){
-         this.name = newName;
+         this.packageName = newName;
          this.updatedFields.add('name');
-         return 0;
       }
-      return -1; 
+      throw new Error('Invalid name');
    }
 
    /**
     * Gets the category ID of the package
     * @returns category ID associated with the package
     */
-   public getCategory(): number{
+   public get categoryId(): number{
       return this.category;
    }
 
@@ -232,21 +228,20 @@ class Package {
     * @param newCategory The new category to change to
     * @return -1 if newCategory is invalid, 0 otherwise
     */
-   public setCategory(newCategory: number): number{
+   public set categoryId(newCategory: number){
       if(newCategory >= 1){
          this.category = newCategory;
          this.updatedFields.add('category');
-         return 0;
       }
-      return -1;
+      throw new Error('Invalid category id');
    }
 
    /**
     * Gets the short description of the package
     * @return package description
     */
-   public getDescription(): string{
-      return this.description;
+   public get description(): string{
+      return this.shortDescription;
    }
 
    /**
@@ -254,21 +249,20 @@ class Package {
     * @param newName The new description to change to
     * @return -1 if newDescription is invalid, 0 otherwise
     */
-   public setDescription(newDescription: string): number{
+   public set description(newDescription: string){
       if(newDescription){
-         this.description = newDescription;
+         this.shortDescription = newDescription;
          this.updatedFields.add('description');
-         return 0;
       }
-      return -1;
+      throw new Error('Invalid description');
    }
 
    /**
     * Gets the example input of the package model
     * @returns Example model input
     */
-   public getInput(): string{
-      return this.input;
+   public get input(): string{
+      return this.modelInput;
    }
 
    /**
@@ -276,21 +270,20 @@ class Package {
     * @param newInput The new input to change to
     * @return -1 if newInput is invalid, 0 otherwise
     */
-   public setInput(newInput: string): number{
+   public set input(newInput: string){
       if(newInput){
-         this.input = newInput;
+         this.modelInput = newInput;
          this.updatedFields.add('input');
-         return 0;
       }
-      return -1;
+      throw new Error('Invalid input');
    }
 
    /**
     * Gets the example output of the package model
     * @return Example model output
     */
-   public getOutput(): string{
-      return this.output;
+   public get output(): string{
+      return this.modelOutput;
    }
 
    /**
@@ -298,20 +291,19 @@ class Package {
     * @param newName The new output to change to
     * @return -1 if newOutput is invalid, 0 otherwise
     */
-   public setOutput(newOutput: string): number{
+   public set output(newOutput: string){
       if(newOutput){
-         this.output = newOutput;
+         this.modelOutput = newOutput;
          this.updatedFields.add('output');
-         return 0;
       }
-      return -1;
+      throw new Error('Invalid output');
    }
 
    /**
     * Gets the raw markdown of the package
     * @return package markdown
     */
-   public getMarkdown(): string{
+   public get md(): string{
       return this.markdown;
    }
 
@@ -320,13 +312,12 @@ class Package {
     * @param newName The new markdown to change to
     * @return -1 if newMarkdown is invalid, 0 otherwise
     */
-   public setMarkdown(newMarkdown:string): number{
+   public set md(newMarkdown:string){
       if(newMarkdown){
          this.markdown = newMarkdown;
          this.updatedFields.add('markdown');
-         return 0;
       }
-      return -1;
+      throw new Error('Invalid markdown');
    }
 }
 

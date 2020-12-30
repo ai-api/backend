@@ -6,12 +6,13 @@ import { AuthService } from '../services/subjects/authService';
 /////////////////////////////////////////////
 ////////////////// CONFIG ///////////////////
 /////////////////////////////////////////////
+
 const router = express.Router();
 const authService = AuthService.getInstance();
-
 /////////////////////////////////////////////
 ////////////////// ROUTES ///////////////////
 /////////////////////////////////////////////
+
 /**
  * Description. Logs the user in by generating
  * a refresh token, and returning it in the
@@ -78,8 +79,7 @@ router.post('/refresh', celebrate({
             'Error': err.message
          });
          return;
-      });   
-
+      });
 });
 
 /**

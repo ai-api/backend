@@ -29,7 +29,7 @@ export class AuthService extends Subject {
    /**
     * The constructor is private so that no one accidentally
     * calls a new reference to the AuthService. Instead, call
-    * UserService.getInstance() 
+    * UserService.getInstance()
     */
    private constructor() {
       super(authEvents);
@@ -37,7 +37,7 @@ export class AuthService extends Subject {
    }
 
    /**
-    * Description. Will return the instance of the UserService 
+    * Will return the instance of the UserService 
     * if it already exists. If it doesn't exist, will create a
     * new instance and return that
     */
@@ -52,7 +52,7 @@ export class AuthService extends Subject {
    ///////////////////////////////////////////////////////////////////////////
 
    /**
-    * Description. Validates a jwt, and returns the user's userId
+    * Validates a jwt, and returns the user's userId
     * if it is valid
     * @param jwt The user's jwt
     */
@@ -66,7 +66,7 @@ export class AuthService extends Subject {
    }
 
    /**
-    * Description. If username and password are valid, will generate,
+    * If username and password are valid, will generate,
     * store, and return a refresh token that can then be used to 
     * authenticate the user. If either username, or password are invalid,
     * will throw an error with the appropriate message
@@ -90,7 +90,20 @@ export class AuthService extends Subject {
    }
 
    /**
-    * Description. Will check if a refresh token is valid, and if it
+    * Will try to delete refresh token from the database. If refresh
+    * token does not exist, will throw an error with the appropriate
+    * message
+    * @param token The user's refresh token
+    */
+   public logout(token: string): void {
+      if (!refreshTokens.delete(token)) {
+         //this.notify('logoutFail', )
+         throw new Error('Refresh Token not found on server');
+      }
+   }
+
+   /**
+    * Will check if a refresh token is valid, and if it
     * is, will return a valid jwt. Otherwise, it will throw an error
     * with the appropriate message
     * @param token The user's refresh token
@@ -126,7 +139,7 @@ export class AuthService extends Subject {
    ///////////////////////////////////////////////////////////////////////////
 
    /**
-    * Description. Generates a string intended to be used as the
+    * Generates a string intended to be used as the
     * value that will be returned to the user
     * @return {string} Returns a string encoded in hex with length
     * of 128 that contains 64 bytes of random bytes (1 byte = 2 chars
@@ -137,7 +150,7 @@ export class AuthService extends Subject {
    }
 
    /**
-    * Description. Checks if the file jwk.json exists
+    * Checks if the file jwk.json exists
     * in /src/config/ and if not, generates the file.
     * Then, sets this.jwk to the contents of jwk.json
     */

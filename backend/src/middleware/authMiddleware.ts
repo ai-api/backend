@@ -23,7 +23,7 @@ const noAuthRoutes = [
  * @param res The current response
  * @param next The next middleware function express will call
  */
-export const authMiddleware = async (req: express.Request , res: express.Response, next: express.NextFunction): Promise<void> => {
+export const authMiddleware = async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
 
    if (noAuthRoutes.includes(req.url)) {
       next();

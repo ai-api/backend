@@ -71,7 +71,7 @@ router.get('/readPackage',(req, res, next)=>{
          console.log(err);
       } 
       // initialize a package object
-      const id = 14;
+      const id = 11;
       Package.getInstance(client, id)
          .then(resultPackage =>{
             client.release();
@@ -95,7 +95,7 @@ router.get('/updatePackage',(req, res, next)=>{
       } 
  
       // initialize a package object
-      const id = 14;
+      const id = 11;
       Package.getInstance(client, id)
          .then(testPackage =>{
             testPackage.categoryId = 2;
@@ -124,7 +124,7 @@ router.get('/deletePackage',(req, res, next)=>{
          client.release();
          console.log(err);
       } 
-      const id = 14;
+      const id = 11;
       Package.getInstance(client, id)
          .then(testPackage =>{
             testPackage.delete()

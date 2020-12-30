@@ -167,6 +167,7 @@ class Package {
       if(newId >= 1){
          this.user = newId;
          this.updatedFields.add('userId');
+         return;
       }
       throw new Error('Invalid ID number');
    }
@@ -211,6 +212,7 @@ class Package {
       if(newName){
          this.packageName = newName;
          this.updatedFields.add('name');
+         return;
       }
       throw new Error('Invalid name');
    }
@@ -232,6 +234,7 @@ class Package {
       if(newCategory >= 1){
          this.category = newCategory;
          this.updatedFields.add('category');
+         return;
       }
       throw new Error('Invalid category id');
    }
@@ -253,6 +256,7 @@ class Package {
       if(newDescription){
          this.shortDescription = newDescription;
          this.updatedFields.add('description');
+         return;
       }
       throw new Error('Invalid description');
    }
@@ -274,6 +278,7 @@ class Package {
       if(newInput){
          this.modelInput = newInput;
          this.updatedFields.add('input');
+         return;
       }
       throw new Error('Invalid input');
    }
@@ -295,6 +300,7 @@ class Package {
       if(newOutput){
          this.modelOutput = newOutput;
          this.updatedFields.add('output');
+         return;
       }
       throw new Error('Invalid output');
    }
@@ -316,6 +322,7 @@ class Package {
       if(newMarkdown){
          this.markdown = newMarkdown;
          this.updatedFields.add('markdown');
+         return;
       }
       throw new Error('Invalid markdown');
    }

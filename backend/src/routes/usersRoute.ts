@@ -3,14 +3,11 @@ import { celebrate, Joi, Segments } from 'celebrate';
 import regexTokens from '../config/regexTokens';
 import { UserService } from '../services/subjects/userService';
 
-
 /////////////////////////////////////////////
 /////////////// ROUTE CONFIG ////////////////
 /////////////////////////////////////////////
 
 const userService = UserService.getInstance();
-
-
 const router = express.Router();
 /////////////////////////////////////////////
 ////////////////// ROUTES ///////////////////
@@ -42,7 +39,7 @@ router.post('/', celebrate({
  */
 router.get('/', celebrate({
    [Segments.QUERY]: Joi.object().keys({
-      userId: Joi.number().positive().integer().required()
+      userId: Joi.number().positive().integer()
    }).unknown(), 
 }), (req,res) => {
    res.json('TODO: Not yet implemented');

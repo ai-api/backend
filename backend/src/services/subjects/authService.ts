@@ -9,7 +9,7 @@ import jwtDecrypt from 'jose/jwt/decrypt';
 import config from '../../config/config';
 
 /**
- * Description. This class contains all functions that relate to
+ * This class contains all functions that relate to
  * authorizing users. It follows both the singleton design pattern,
  * and is also a subject that other classes/objects can subscribe to
  */
@@ -37,9 +37,9 @@ export class AuthService extends Subject {
    }
 
    /**
-    * Will return the instance of the UserService 
-    * if it already exists. If it doesn't exist, will create a
-    * new instance and return that
+    * Will return the instance of the AuthService if
+    * it already exists. If it doesn't exist, will create
+    * a new instance and return that
     */
    public static getInstance(): AuthService {
       if (!AuthService.instance) {

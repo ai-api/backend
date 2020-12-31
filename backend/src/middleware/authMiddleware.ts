@@ -37,8 +37,6 @@ const noAuthRoutes = [
  */
 export const authMiddleware = async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
 
-   console.log(req.url);
-   console.log(typeof req.method == 'string')
    if (noAuthRoutes.some((route) => req.url == route.url && req.method == route.method)) {
       next();
       return;

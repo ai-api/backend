@@ -1,10 +1,17 @@
 import express from 'express';
-import { celebrate, Joi, Segments, errors } from 'celebrate';
+import { celebrate, Joi, Segments } from 'celebrate';
+import { PackageService } from '../services/subjects/packageService';
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////// CONFIG //////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 
 const router = express.Router();
-
+const packageService = PackageService.getInstance();
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////// ROUTES //////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 /**
- * Description. Creates a new package
+ * Creates a new package
  * Response:
  * 200 on success and returns @packageId
  * in the body
@@ -24,7 +31,7 @@ router.post('/', celebrate({
 });
 
 /**
- * Description. Returns a package based on 
+ * Returns a package based on 
  * @packageId provided as a query param
  * Response:
  * 200 on success
@@ -36,10 +43,11 @@ router.get('/', celebrate({
    }).unknown(),
 }), (req,res) => {
    res.json('TODO: Not yet implemented');
+   packageService.create();
 });
 
 /**
- * Description. Updates any of the package's 
+ * Updates any of the package's 
  * settings
  * Response:
  * 200 on success

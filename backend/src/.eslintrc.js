@@ -18,7 +18,10 @@ module.exports = {
    'rules': {
       'indent': [
          'error',
-         3
+         3,
+         {
+            'MemberExpression': 'off'
+         }
       ],
       'linebreak-style': [
          'error',

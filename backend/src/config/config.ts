@@ -11,7 +11,14 @@ interface Config {
       ip: string,
       port: number
    }
-};
+   auth: {
+      alg: string,
+      enc: string,
+      iss: string,
+      aud: string,
+   }
+}
+
 const dev: Config = {
    'port': '8080',
    'db': {
@@ -24,6 +31,12 @@ const dev: Config = {
    'ts': {
       'ip': 'localhost',
       'port': 7777
+   },
+   'auth': {
+      'alg': 'A256KW',
+      'enc': 'A256GCM',
+      'iss': 'aiapi.app',
+      'aud': 'aiapi.app'
    }
 };
 const prod: Config = {
@@ -38,6 +51,12 @@ const prod: Config = {
    'ts': {
       'ip': 'ts',
       'port': 8501,
+   },
+   'auth': {
+      'alg': 'A256KW',
+      'enc': 'A256GCM',
+      'iss': 'aiapi.app',
+      'aud': 'aiapi.app'
    }
 };
 

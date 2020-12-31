@@ -3,7 +3,7 @@ import { Subject } from './subject';
 /**
  * Description. This class container all functions that relate
  * to performing any CRUD operations on a user. It follows both
- * the Singleton design pattern, and is also a Subject that other
+ * the singleton design pattern, and is also a subject that other
  * classes/objects can subscribe to 
  */
 export class UserService extends Subject {
@@ -20,18 +20,18 @@ export class UserService extends Subject {
     */
    private constructor() {
       /**
-       * @userServiceEvents are all of the valid events 
+       * @userEvents are all of the valid events 
        * that the UserService Subject can invoke. Other
        * classes/objects can subscribe to 'listen' for 
        * them
        */
-      const userServiceEvents = [
+      const userEvents = [
          'create',
          'get',
          'update',
          'delete'
       ];
-      super(userServiceEvents);
+      super(userEvents);
    }
 
    public create(): void {
@@ -49,5 +49,4 @@ export class UserService extends Subject {
       }
       return UserService.instance;
    }
-
 }

@@ -1,11 +1,20 @@
 import express from 'express';
 import { celebrate, Joi, Segments } from 'celebrate';
 import regexTokens from '../config/regexTokens';
+import { AuthService } from '../services/subjects/authService';
+
+/////////////////////////////////////////////
+////////////////// CONFIG ///////////////////
+/////////////////////////////////////////////
 
 const router = express.Router();
+const authService = AuthService.getInstance();
+/////////////////////////////////////////////
+////////////////// ROUTES ///////////////////
+/////////////////////////////////////////////
 
 /**
- * Description. Logs the user in by generating
+ * Logs the user in by generating
  * a refresh token, and returning it in the
  * response
  * Response:
@@ -18,12 +27,25 @@ router.post('/', celebrate({
       username: Joi.string().regex(regexTokens.username).required(),
       password: Joi.string().regex(regexTokens.password).required()
    }).unknown(), 
-}) , (req,res) => {
-   res.json('TODO: Not yet implemented');
+}) ,(req,res) => {
+   const username = req.body.username;
+   const password = req.body.password;
+  
+   authService.login(username, password)
+      .then((refreshToken) => {
+         res.status(200).json({
+            'refreshToken': refreshToken
+         });
+      })
+      .catch((err) => {
+         res.status(401).json({
+            'Error': err.message
+         });
+      });
 });
 
 /**
- * Description. Logs the user in by generating
+ * Logs the user in by generating
  * a refresh token, and returning it in the
  * response
  */
@@ -36,7 +58,7 @@ router.post('/google', celebrate({
 });
 
 /**
- * Description. Generates a new JWT for the
+ * Generates a new JWT for the
  * user, assuming that a valid refreshToken was
  * sent in the body
  */
@@ -44,12 +66,24 @@ router.post('/refresh', celebrate({
    [Segments.BODY]: Joi.object().keys({
       refreshToken: Joi.string().token().required(), // TODO: add regex to make sure token is proper len
    }).unknown(),
-}), (req,res) => {
-   res.json('TODO: Not yet implemented');
+}), async (req,res) => {
+   const refreshToken = req.body.refreshToken;
+   authService.refresh(refreshToken)
+      .then((jwt: string) => {
+         res.status(200).json({
+            'jwt': jwt
+         });
+      })
+      .catch((err: Error) => {
+         res.status(401).json({
+            'Error': err.message
+         });
+         return;
+      });
 });
 
 /**
- * Description. Logs the user out by deleting 
+ * Logs the user out by deleting 
  * the refresh token from the server. Important
  * to note that the last JWT the user grabbed 
  * will still be valid until it times out
@@ -68,3 +102,5 @@ router.delete('/', celebrate({
  * in app.ts
  */
 export default router;
+
+

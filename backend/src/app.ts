@@ -4,10 +4,11 @@ import fs from 'fs';
 import express from 'express';
 import config from './config/config';
 import bodyParser from 'body-parser';
-
 import authRouter from './routes/authRoute';
 import usersRouter from './routes/usersRoute';
 import dbTestRouter from './routes/dbTestRoute';
+import { authMiddleware } from './middleware/authMiddleware';
+
 /* Init express */
 const app = express();
 /////////////////////////////////////////////
@@ -17,14 +18,17 @@ const app = express();
 /* bodyParser is req'd to process json body */
 app.use(bodyParser.json());
 
-/* Handles all requests to /auth */
+/* Add auth middleware */
+app.use(authMiddleware);
+
+/* Add all routers to app */
 app.use('/auth', authRouter);
-//app.use('/users/', usersRouter);
+app.use('/users/', usersRouter);
 
 /* Used to debug/test database operations */
 app.use('/dbTest/', dbTestRouter);
 /**
- * For some reason you need to add errors()
+ * For some reason you need to add errors() 
  * after you add all of the routes, otherwise
  * it doesn't work
  */
@@ -48,12 +52,12 @@ client.connect()
       console.log(err);
    });
 
-/* Run SQL script to initialize database tables */
-var initDbSql = fs.readFileSync('src/db/loadTables.sql').toString();
-client.query(initDbSql, function(err){
-   if(err)
-      console.log('ERROR: Could not successfully load tables', err);
-});
+/* Run SQL script to initialize database tables */ //TODO: uncomment back later
+// const initDbSql = fs.readFileSync('src/db/loadTables.sql').toString(); 
+// client.query(initDbSql, function(err){
+//    if(err)
+//       console.log('ERROR: Could not successfully load tables', err);
+// });
 
 /////////////////////////////////////////////
 ////////////// EXPRESS CONFIG ///////////////

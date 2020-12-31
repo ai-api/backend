@@ -14,10 +14,10 @@ router.post('/', celebrate({
    [Segments.BODY]: Joi.object().keys({
       packageName: Joi.string().alphanum().required(),
       category: Joi.string().required(), // TODO: make it only possible to be certain words
-      flags: Joi.object().required(),
+      // flags: Joi.object().required(), // TODO: add back flags when functionality exists
       desciption: Joi.string().required(),
-      input: Joi.string().required(), // TODO: make more strict
-      output: Joi.string().required() // TODO: make more strict
+      input: Joi.string().required(), 
+      output: Joi.string().required()
    }).unknown(),
 }), (req,res) => {
    res.json('TODO: Not yet implemented');

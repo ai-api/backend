@@ -94,8 +94,22 @@ router.delete('/', celebrate({
       global: Joi.bool().optional()
    }).unknown(),
 }), (req,res) => {
-   res.json('TODO: Not yet implemented');
+
+   const refreshToken = req.body.refreshToken;
+   const global = req.body.global;
+   const userId = req.userId;
+   authService.logout(userId, refreshToken, global)
+      .then(() => {
+         res.status(200).send();
+      })
+      .catch((err) => {
+         res.status(500).json({
+            'Error': err.message
+         });
+      });
+ 
 });
+
 
 /**
  * Export the router so we can use it

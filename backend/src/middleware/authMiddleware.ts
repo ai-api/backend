@@ -6,10 +6,22 @@ import express from 'express';
  * authentication
  */
 const noAuthRoutes = [
-   '/users/new',
-   '/auth/',
-   '/auth/google',
-   '/auth/refresh'
+   {
+      url: '/users',
+      method: 'POST'
+   },
+   {
+      url: '/auth',
+      method: 'POST'
+   },
+   {
+      url: '/auth/google',
+      method: 'POST'
+   },
+   {
+      url: '/auth/refresh',
+      method: 'POST'
+   }
 ];
 
 /**
@@ -25,7 +37,7 @@ const noAuthRoutes = [
  */
 export const authMiddleware = async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
 
-   if (noAuthRoutes.includes(req.url)) {
+   if (noAuthRoutes.some((route) => req.url == route.url && req.method == route.method)) {
       next();
       return;
    }

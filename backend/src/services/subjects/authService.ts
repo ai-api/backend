@@ -93,9 +93,18 @@ export class AuthService extends Subject {
     * Will try to delete refresh token from the database. If refresh
     * token does not exist, will throw an error with the appropriate
     * message
+    * TODO: Allow users to be logged out globally
+    * 
+    * @param userId The user's id
     * @param token The user's refresh token
+    * @param global True if the user wishes to log out from all devices
     */
-   public logout(token: string): void {
+   public async logout(userId: number, token: string, global: boolean): Promise<void> {
+
+      if (refreshTokens.get(token) != userId) {
+         throw new Error('Refresh Token does not correspond to this user');
+      }
+
       if (!refreshTokens.delete(token)) {
          //this.notify('logoutFail', )
          throw new Error('Refresh Token not found on server');

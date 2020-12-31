@@ -19,7 +19,7 @@ router.post('/', celebrate({
       input: Joi.string().required(), // TODO: make more strict
       output: Joi.string().required() // TODO: make more strict
    }).unknown(),
-   }), (req,res) => {
+}), (req,res) => {
    res.json('TODO: Not yet implemented');
 });
 
@@ -34,7 +34,7 @@ router.get('/', celebrate({
    [Segments.QUERY]: Joi.object().keys({
       packageId: Joi.number().positive().integer().required()
    }).unknown(),
-   }), (req,res) => {
+}), (req,res) => {
    res.json('TODO: Not yet implemented');
 });
 
@@ -57,7 +57,7 @@ router.patch('/', celebrate({
       input: Joi.string(), // TODO: make more strict
       output: Joi.string() // TODO: make more strict
    }).unknown(),
-   }), (req,res) => {
+}), (req,res) => {
    res.json('TODO: Not yet implemented');
 });
 

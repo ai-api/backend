@@ -14,7 +14,7 @@ const authService = AuthService.getInstance();
 /////////////////////////////////////////////
 
 /**
- * Description. Logs the user in by generating
+ * Logs the user in by generating
  * a refresh token, and returning it in the
  * response
  * Response:
@@ -45,7 +45,7 @@ router.post('/', celebrate({
 });
 
 /**
- * Description. Logs the user in by generating
+ * Logs the user in by generating
  * a refresh token, and returning it in the
  * response
  */
@@ -58,7 +58,7 @@ router.post('/google', celebrate({
 });
 
 /**
- * Description. Generates a new JWT for the
+ * Generates a new JWT for the
  * user, assuming that a valid refreshToken was
  * sent in the body
  */
@@ -83,7 +83,7 @@ router.post('/refresh', celebrate({
 });
 
 /**
- * Description. Logs the user out by deleting 
+ * Logs the user out by deleting 
  * the refresh token from the server. Important
  * to note that the last JWT the user grabbed 
  * will still be valid until it times out

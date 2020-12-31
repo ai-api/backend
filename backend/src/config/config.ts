@@ -45,7 +45,7 @@ const prod: Config = {
       'name': 'aiapi',
       'username': 'admin',
       'password': 'c0cac0la',
-      'ip': 'localhost',
+      'ip': 'db',
       'port': 5432
    },
    'ts': {

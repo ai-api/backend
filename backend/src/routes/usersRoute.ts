@@ -13,7 +13,7 @@ const router = express.Router();
 ////////////////// ROUTES ///////////////////
 /////////////////////////////////////////////
 /**
- * Description. Creates a new user
+ * Creates a new user
  * Response:
  * 200 on success
  * 409 if username or email already exists
@@ -29,7 +29,7 @@ router.post('/', celebrate({
 });
 
 /**
- * Description. Returns a user based on
+ * Returns a user based on
  * @userId provided as a query param
  * Response:
  * 200 OK if success
@@ -46,7 +46,7 @@ router.get('/', celebrate({
 });
 
 /**
- * Description. Updates any of the user's 
+ * Updates any of the user's 
  * settings
  * Response:
  * 200 OK on success

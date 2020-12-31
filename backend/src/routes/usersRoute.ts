@@ -3,17 +3,20 @@ import { celebrate, Joi, Segments } from 'celebrate';
 import regexTokens from '../config/regexTokens';
 import { UserService } from '../services/subjects/userService';
 
+
 /////////////////////////////////////////////
 /////////////// ROUTE CONFIG ////////////////
 /////////////////////////////////////////////
 
 const userService = UserService.getInstance();
+
+
 const router = express.Router();
 /////////////////////////////////////////////
 ////////////////// ROUTES ///////////////////
 /////////////////////////////////////////////
 /**
- * Creates a new user
+ * Description. Creates a new user
  * Response:
  * 200 on success
  * 409 if username or email already exists
@@ -29,7 +32,7 @@ router.post('/', celebrate({
 });
 
 /**
- * Returns a user based on
+ * Description. Returns a user based on
  * @userId provided as a query param
  * Response:
  * 200 OK if success
@@ -46,7 +49,7 @@ router.get('/', celebrate({
 });
 
 /**
- * Updates any of the user's 
+ * Description. Updates any of the user's 
  * settings
  * Response:
  * 200 OK on success

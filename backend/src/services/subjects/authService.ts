@@ -100,11 +100,9 @@ export class AuthService extends Subject {
     * @param global True if the user wishes to log out from all devices
     */
    public async logout(userId: number, token: string, global: boolean): Promise<void> {
-
       if (refreshTokens.get(token) != userId) {
-         throw new Error('Refresh Token does not correspond to this user');
+         throw new Error('This refresh token was not found for user on the server');
       }
-
       if (!refreshTokens.delete(token)) {
          //this.notify('logoutFail', )
          throw new Error('Refresh Token not found on server');

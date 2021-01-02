@@ -15,17 +15,18 @@ class Package {
    private modelOutput: string;
    private markdown: string;
    private updatedFields: Set<string>;
-   /*
-    * @userId: The user's unique ID number
-    * @name: The name of the package
-    * @category: The category of the package
-    * @description: A short description of the package
-    * @input: An example input for the AI model
-    * @output: The output of the example input
-    * @id: (Optional) The table id of the package. Defaults to -1
-    * @lastUpdated: (Optional) Date of the last update to the package. Defaults to empty string
-    * @numApiCalls: (Optional) Number of times this package's model was requested. Defaults to 0
-    * @markdown: (Optional) markdown file. Defaults to empty string
+   /**
+    * @param client The postgres client used to make database queries
+    * @param userId: The user's unique ID number
+    * @param name The name of the package
+    * @param category: The category of the package
+    * @param description: A short description of the package
+    * @param input An example input for the AI model
+    * @param output The output of the example input
+    * @param markdown (Optional) markdown file. Defaults to empty string
+    * @param id (Optional) The table id of the package. Defaults to -1
+    * @param lastUpdated (Optional) Date of the last update to the package. Defaults to empty string
+    * @param numApiCalls (Optional) Number of times this package's model was requested. Defaults to 0
     */
    private constructor(client: PoolClient, userId: number, name: string, category: number, description: string, input: string, 
       output: string, markdown = '', id = -1, lastUpdated = new Date(), numApiCalls = 0){
@@ -100,13 +101,16 @@ class Package {
     * client can't insert the object, -1 is returned if an error occurs
     */
    private async create(): Promise<number>{
-      console.log('CREATING NEW PACKAGE');
       this.setLastUpdated();
       const columnNames: Array<string> = ['userId', 'lastUpdated','numApiCalls','name',
          'category', 'description', 'input', 'output', 'markdown'];
       const columnValues: Array<unknown> = [ this.user, this.lastUpdated, this.numApiCalls, this.packageName,
          this.category, this.shortDescription, this.modelInput, this.modelOutput, this.markdown];
-      return await dbCreate(this.client, this.tableName, columnNames, columnValues);
+      const id = await dbCreate(this.client, this.tableName, columnNames, columnValues);
+      this.setId(id);
+      if(!id)
+         throw new Error('Package could not be created');
+      return id;
    }
 
    /**
@@ -148,8 +152,17 @@ class Package {
     * Gets the ID of the package object
     * @return ID number of the package
     */
-   public get idNum(): number{
+   public get id(): number{
       return this.sysId;
+   }
+
+   /**
+    * Sets the ID of the package object
+    */
+   private setId(newId: number): void{
+      if(!newId)
+         throw new Error('New ID is invalid');
+      this.sysId = newId;
    }
 
    /**
@@ -228,7 +241,6 @@ class Package {
    /**
     * Changes the category ID associated with the package
     * @param newCategory The new category to change to
-    * @return -1 if newCategory is invalid, 0 otherwise
     */
    public set categoryId(newCategory: number){
       if(newCategory >= 1){
@@ -250,7 +262,6 @@ class Package {
    /**
     * Changes the description of the package
     * @param newName The new description to change to
-    * @return -1 if newDescription is invalid, 0 otherwise
     */
    public set description(newDescription: string){
       if(newDescription){
@@ -272,7 +283,6 @@ class Package {
    /**
     * Changes the input of the package
     * @param newInput The new input to change to
-    * @return -1 if newInput is invalid, 0 otherwise
     */
    public set input(newInput: string){
       if(newInput){
@@ -294,7 +304,6 @@ class Package {
    /**
     * Changes the example output of the package
     * @param newName The new output to change to
-    * @return -1 if newOutput is invalid, 0 otherwise
     */
    public set output(newOutput: string){
       if(newOutput){
@@ -316,7 +325,6 @@ class Package {
    /**
     * Changes the mardown of the package
     * @param newName The new markdown to change to
-    * @return -1 if newMarkdown is invalid, 0 otherwise
     */
    public set md(newMarkdown:string){
       if(newMarkdown){

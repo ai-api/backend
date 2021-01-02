@@ -60,7 +60,11 @@ class User {
       console.log('CREATING NEW USER');
       const columnNames: Array<string> = ['username', 'password','email','apiKey', 'profilePicture'];
       const columnValues: Array<unknown> = [ this.user, this.pass, this.emailAddress, this.key, this.profilePicture];
-      return await dbCreate(this.client, this.tableName, columnNames, columnValues);
+      const id = await dbCreate(this.client, this.tableName, columnNames, columnValues);
+      this.setId(id);
+      if(!id)
+         throw new Error('Package could not be created');
+      return id;
    }
 
    /**

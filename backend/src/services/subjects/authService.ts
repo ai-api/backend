@@ -7,7 +7,7 @@ import parseJwk from 'jose/jwk/parse';
 import EncryptJWT from 'jose/jwt/encrypt';
 import jwtDecrypt from 'jose/jwt/decrypt';
 import config from '../../config/config';
-
+import ErrorResponse from '../helpers/httpResponses/errorResponse';
 /**
  * This class contains all functions that relate to
  * authorizing users. It follows both the singleton design pattern,
@@ -78,11 +78,11 @@ export class AuthService extends Subject {
       const user = users.get(username);
       if (!user) {
          this.notify('loginFail', user);
-         throw new Error('Invalid Username');
+         throw new ErrorResponse(401, 'Invalid Username');
       }
       if (user.password != password) {
          this.notify('loginFail', user);
-         throw new Error('Invalid Password');
+         throw new ErrorResponse(401, 'Invalid Password');
       }
       const refreshToken = this.genRefreshToken();
       refreshTokens.set(refreshToken, user.id);
@@ -101,11 +101,11 @@ export class AuthService extends Subject {
     */
    public async logout(userId: number, token: string, global: boolean): Promise<void> {
       if (refreshTokens.get(token) != userId) {
-         throw new Error('This refresh token was not found for user on the server');
+         throw new ErrorResponse(404, 'This refresh token was not found for user on the server');
       }
       if (!refreshTokens.delete(token)) {
          //this.notify('logoutFail', )
-         throw new Error('Refresh Token not found on server');
+         throw new ErrorResponse(404, 'Refresh Token not found on server');
       }
    }
 
@@ -120,7 +120,7 @@ export class AuthService extends Subject {
       const userId = refreshTokens.get(token);
       if (userId == undefined) {
          this.notify('refreshFail', user); // TODO: Properly grab user object
-         throw new Error('Refresh Token not found on server');
+         throw new ErrorResponse(401, 'Refresh Token not found on server');
       }
 
       const payload = {

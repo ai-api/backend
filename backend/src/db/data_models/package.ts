@@ -15,6 +15,7 @@ class Package {
    private modelOutput: string;
    private markdown: string;
    private updatedFields: Set<string>;
+
    /*
     * @userId: The user's unique ID number
     * @name: The name of the package
@@ -75,9 +76,7 @@ class Package {
    public static createInstance(client: PoolClient, userId: number, name: string, category: number, description: string, 
       input: string, output: string, markdown = ''): Package{
 
-      if(client && userId && name && category && description && input && output)
-         return new Package(client, userId, name, category, description, input, output, markdown);
-      throw new Error('One or more invalid method arguments');
+      return new Package(client, userId, name, category, description, input, output, markdown);
    }
 
    /**
@@ -88,7 +87,7 @@ class Package {
     * client can't save the object, -1 is returned if an error occurs
     */
    public async save(): Promise<number>{
-      if(this.sysId >= 1)
+      if(this.sysId >= 1) 
          return await this.update();
       return await this.create();
    }
@@ -106,7 +105,12 @@ class Package {
          'category', 'description', 'input', 'output', 'markdown'];
       const columnValues: Array<unknown> = [ this.user, this.lastUpdated, this.numApiCalls, this.packageName,
          this.category, this.shortDescription, this.modelInput, this.modelOutput, this.markdown];
-      return await dbCreate(this.client, this.tableName, columnNames, columnValues);
+      const id = await dbCreate(this.client, this.tableName, columnNames, columnValues);
+      if (id < 1) {
+         throw new Error('Couldn\'t create in database');
+      }
+      this.setId(id);
+      return id;
    }
 
    /**
@@ -150,6 +154,14 @@ class Package {
     */
    public get idNum(): number{
       return this.sysId;
+   }
+
+   private setId(id: number): void {
+      if (id) {
+         this.sysId = id;
+         return;
+      }
+      throw new Error('Can\'t set Id');
    }
 
    /**

@@ -2,6 +2,7 @@ import express from 'express';
 import { celebrate, Joi, Segments } from 'celebrate';
 import regexTokens from '../config/regexTokens';
 import { AuthService } from '../services/subjects/authService';
+import HttpError from '../services/helpers/httpResponses/errorResponse';
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// CONFIG //////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -35,8 +36,8 @@ router.post('/', celebrate({
             'refreshToken': refreshToken
          });
       })
-      .catch((err) => {
-         res.status(401).json({
+      .catch((err: HttpError) => {
+         res.status(err.statusCode).json({
             'Error': err.message
          });
       });
@@ -72,8 +73,8 @@ router.post('/refresh', celebrate({
             'jwt': jwt
          });
       })
-      .catch((err: Error) => {
-         res.status(401).json({
+      .catch((err: HttpError) => {
+         res.status(err.statusCode).json({
             'Error': err.message
          });
          return;
@@ -100,8 +101,8 @@ router.delete('/', celebrate({
       .then(() => {
          res.status(200).send();
       })
-      .catch((err) => {
-         res.status(500).json({
+      .catch((err: HttpError) => {
+         res.status(err.statusCode).json({
             'Error': err.message
          });
       });

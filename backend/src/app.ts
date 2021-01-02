@@ -28,10 +28,10 @@ app.use('/packages/', packagesRouter);
 
 /* Used to debug/test database operations */
 app.use('/dbTest/', dbTestRouter);
+
 /**
- * For some reason you need to add errors() 
- * after you add all of the routes, otherwise
- * it doesn't work
+ * For some reason you need to add errors() after you add all of
+ * the routes, otherwise it doesn't work
  */
 app.use(errors());
 ///////////////////////////////////////////////////////////////////////////

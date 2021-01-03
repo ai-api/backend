@@ -84,8 +84,10 @@ router.get('/', celebrate({
  * 404 if package not found
  */
 router.patch('/', celebrate({
+   [Segments.QUERY]: Joi.object().keys({
+      packageId: Joi.number().positive().integer().required()
+   }).unknown(),
    [Segments.BODY]: Joi.object().keys({
-      packageId: Joi.number().positive().integer().required(),
       packageName: Joi.string().alphanum(),
       category: Joi.string(), // TODO: make it only possible to be certain words
       flags: Joi.object(),
@@ -94,7 +96,7 @@ router.patch('/', celebrate({
       output: Joi.string() // TODO: make more strict
    }).unknown(),
 }), (req,res) => {
-   const packageId = req.body.packageId;
+   const packageId = Number(req.query.packageId);
    const packageName = req.body.name;
    const category = req.body.category;
    const description = req.body.description;

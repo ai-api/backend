@@ -12,6 +12,7 @@ class User {
    private client: PoolClient;
    private updatedFields: Set<string>;
    private tableName: string;
+
    private constructor(client: PoolClient, username: string, password: string, email: string, apiKey: string, id: number, profilePicture: string){
       this.client = client;
       this.user = username;
@@ -99,6 +100,78 @@ class User {
          return 0;
       }
       return -1;
+   }
+
+   /**
+    * Gets the ID of the package object
+    * @return ID number of the package
+    */
+   public get id(): number{
+      return this.sysId;
+   }
+
+   /**
+    * Sets the ID of the package object
+    */
+   private setId(newId: number): void{
+      if(newId <= 0)
+         throw new Error('New ID is invalid');
+      this.sysId = newId;
+   }
+
+   public get username(): string{
+      return this.user;
+   }
+
+   public set username(newUsername: string){
+      if(!newUsername)
+         throw new Error('New username is invalid');
+      this.updatedFields.add('username');
+      this.user = newUsername;
+   }
+
+   public get password(): string{
+      return this.pass;
+   }
+
+   public set password(newPassword: string){
+      if(!newPassword)
+         throw new Error('New password is invalid');
+      this.updatedFields.add('password');
+      this.pass = newPassword;
+   }
+
+   public get email(): string{
+      return this.emailAddress;
+   }
+
+   public set email(newEmail: string){
+      if(!newEmail)
+         throw new Error('New email is invalid');
+      this.updatedFields.add('email');
+      this.emailAddress = newEmail;
+   }
+
+   public get apiKey(): string{
+      return this.key;
+   }
+
+   public set apiKey(newApiKey: string){
+      if(!newApiKey)
+         throw new Error('New API key is invalid');
+      this.updatedFields.add('apiKey');
+      this.key = newApiKey;
+   }
+
+   public get picture(): string{
+      return this.profilePicture;
+   }
+
+   public set picture(newPicture: string){
+      if(!newPicture)
+         throw new Error('New profile picture URL is invalid');
+      this.updatedFields.add('profilePicture');
+      this.picture = newPicture;
    }
 }
 // id SERIAL PRIMARY KEY,

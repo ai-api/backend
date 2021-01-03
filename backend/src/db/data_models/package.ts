@@ -121,7 +121,6 @@ class Package {
     * client can't update the object, -1 is returned if an error occurs
     */
    private async update(): Promise<number>{
-      console.log('UPDATING EXISTING PACKAGE');
       if(this.updatedFields.size == 0)
          return 0;
       this.setLastUpdated();
@@ -160,7 +159,7 @@ class Package {
     * Sets the ID of the package object
     */
    private setId(newId: number): void{
-      if(!newId)
+      if(newId <= 0)
          throw new Error('New ID is invalid');
       this.sysId = newId;
    }
@@ -222,12 +221,11 @@ class Package {
     * @param newName The new name to change to
     */
    public set name(newName: string){
-      if(newName){
-         this.packageName = newName;
-         this.updatedFields.add('name');
-         return;
-      }
-      throw new Error('Invalid name');
+      if(!newName)
+         throw new Error('New name is Invalid');
+      this.packageName = newName;
+      this.updatedFields.add('name');
+      
    }
 
    /**
@@ -243,12 +241,10 @@ class Package {
     * @param newCategory The new category to change to
     */
    public set categoryId(newCategory: number){
-      if(newCategory >= 1){
-         this.category = newCategory;
-         this.updatedFields.add('category');
-         return;
-      }
-      throw new Error('Invalid category id');
+      if(newCategory <= 0)
+         throw new Error('New category ID is invalid');
+      this.category = newCategory;
+      this.updatedFields.add('category');
    }
 
    /**
@@ -264,12 +260,10 @@ class Package {
     * @param newName The new description to change to
     */
    public set description(newDescription: string){
-      if(newDescription){
-         this.shortDescription = newDescription;
-         this.updatedFields.add('description');
-         return;
-      }
-      throw new Error('Invalid description');
+      if(!newDescription)
+         throw new Error('Invalid description');
+      this.shortDescription = newDescription;
+      this.updatedFields.add('description');
    }
 
    /**
@@ -285,12 +279,10 @@ class Package {
     * @param newInput The new input to change to
     */
    public set input(newInput: string){
-      if(newInput){
-         this.modelInput = newInput;
-         this.updatedFields.add('input');
-         return;
-      }
-      throw new Error('Invalid input');
+      if(!newInput)
+         throw new Error('New input is invalid');
+      this.modelInput = newInput;
+      this.updatedFields.add('input');
    }
 
    /**
@@ -306,12 +298,10 @@ class Package {
     * @param newName The new output to change to
     */
    public set output(newOutput: string){
-      if(newOutput){
-         this.modelOutput = newOutput;
-         this.updatedFields.add('output');
-         return;
-      }
-      throw new Error('Invalid output');
+      if(!newOutput)
+         throw new Error('New output is invalid');
+      this.modelOutput = newOutput;
+      this.updatedFields.add('output');
    }
 
    /**
@@ -327,12 +317,11 @@ class Package {
     * @param newName The new markdown to change to
     */
    public set md(newMarkdown:string){
-      if(newMarkdown){
-         this.markdown = newMarkdown;
-         this.updatedFields.add('markdown');
-         return;
-      }
-      throw new Error('Invalid markdown');
+      if(!newMarkdown)
+         throw new Error('New markdown is Invalid');
+      this.markdown = newMarkdown;
+      this.updatedFields.add('markdown');
+      
    }
 }
 

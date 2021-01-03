@@ -1,8 +1,8 @@
 import express from 'express';
 import { celebrate, Joi, Segments } from 'celebrate';
 import { PackageService } from '../services/subjects/packageService';
-import HttpError from '../services/helpers/httpResponses/errorResponse';
-import PackageResponse from '../services/helpers/httpResponses/packageResponse';
+import HttpError from '../models/httpModels/httpError';
+import HttpPackage from '../models/httpModels/httpPackage';
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// CONFIG //////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -17,7 +17,7 @@ const packageService = PackageService.getInstance();
  * Creates a new package
  * Response:
  *  - 201 on success and returns the package. The response also has the
- *    Location header as per REST rules
+ *    location header as per REST rules
  *  - 409 if packageName already exists
  */
 router.post('/', celebrate({
@@ -38,19 +38,16 @@ router.post('/', celebrate({
    const output = req.body.output;
    const md = req.body.markdown;
    const userId = req.userId;
-
    packageService.create(userId, packageName, category, description,
       input, output, md)
-      .then((newPackage: PackageResponse) => {
-         const packageResp = newPackage.format();
+      .then((newPackage: HttpPackage) => {
          /* Set the location header to be restful */
-         res.location('/packages/' + packageResp.id);
-         res.status(201).json(packageResp);
+         console.log(newPackage.statusCode);
+         res.location('/packages/' + newPackage.id);
+         res.status(newPackage.statusCode).send(newPackage.format());
       })
       .catch((err: HttpError) => {
-         res.status(err.statusCode).json({
-            'Error': err.message
-         });
+         res.status(err.statusCode).send(err.format);
       });
 });
 
@@ -66,8 +63,15 @@ router.get('/', celebrate({
       packageId: Joi.number().positive().integer().required()
    }).unknown(),
 }), (req,res) => {
-   res.json('TODO: Not yet implemented');
-
+   const packageId = Number(req.query.packageId);
+   packageService.read(packageId)
+      .then((foundPackage: HttpPackage) => {
+         res.status(foundPackage.statusCode).send(foundPackage.format());
+      })
+      .catch((err: HttpError) => {
+         res.status(err.statusCode).send(err.format());
+      });
+   
 });
 
 /**
@@ -90,7 +94,23 @@ router.patch('/', celebrate({
       output: Joi.string() // TODO: make more strict
    }).unknown(),
 }), (req,res) => {
-   res.json('TODO: Not yet implemented');
+   const packageId = req.body.packageId;
+   const packageName = req.body.name;
+   const category = req.body.category;
+   const description = req.body.description;
+   const input = req.body.input;
+   const output = req.body.output;
+   const md = req.body.markdown;
+   const userId = req.userId;
+
+   packageService.update(packageId, userId, packageName, category,
+      description, input, output, md)
+      .then((updatedPack: HttpPackage) => {
+         res.status(updatedPack.statusCode).send(updatedPack.format());
+      })
+      .catch((err: HttpError) => {
+         res.status(err.statusCode).send(err.format);
+      });
 });
 
 /**

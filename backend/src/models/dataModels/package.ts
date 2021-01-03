@@ -1,6 +1,7 @@
 import { PoolClient } from 'pg';
-import {dbCreate, dbReadById, dbUpdate, dbRemove} from '../dbOperations';
-import TableNames from '../enums/tableNames';
+import {dbCreate, dbReadById, dbUpdate, dbRemove} from '../../db/dbOperations';
+import TableNames from '../../db/enums/tableNames';
+import HttpPackage from '../httpModels/httpPackage';
 class Package {
    private client: PoolClient;
    private tableName: string;
@@ -54,6 +55,7 @@ class Package {
     */
    public static async getInstance(client: PoolClient, id: number): Promise<Package>{
       const data = await dbReadById(client, TableNames.PACKAGE, id);
+      console.log(data);
       if(data)
          return new Package(client, data.userid, data.name, data.category, data.description, data.input,
             data.output, data.markdown, data.id, data.lastupdated, data.numapicalls);
@@ -91,6 +93,7 @@ class Package {
          return await this.update();
       return await this.create();
    }
+
    /**
     * Creates a new package entry in the package table using
     * the fields in the current object

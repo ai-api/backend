@@ -2,7 +2,7 @@ import express from 'express';
 import { celebrate, Joi, Segments } from 'celebrate';
 import regexTokens from '../config/regexTokens';
 import { AuthService } from '../services/subjects/authService';
-import HttpError from '../services/helpers/httpResponses/errorResponse';
+import HttpError from '../models/httpModels/httpError';
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// CONFIG //////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////

@@ -8,7 +8,8 @@ import authRouter from './routes/authRoute';
 import usersRouter from './routes/usersRoute';
 import packagesRouter from './routes/packagesRoute';
 import dbTestRouter from './routes/dbTestRoute';
-import { authMiddleware } from './middleware/authMiddleware';
+import authMiddleware from './middleware/authMiddleware';
+import jsonMiddleware from './middleware/jsonMiddleware';
 ///////////////////////////////////////////////////////////////////////////
 //////////////////////////////// MIDDLEWARE ///////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -19,6 +20,9 @@ const app = express();
 app.use(bodyParser.json());
 
 /* Add auth middleware */
+app.use(jsonMiddleware);
+
+/* Add json middleware */
 app.use(authMiddleware);
 
 /* Add all routers to app */

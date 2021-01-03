@@ -1,10 +1,11 @@
 import { Subject } from './subject';
 import config from '../../config/config';
-import Package from '../../db/data_models/package';
+import Package from '../../models/dataModels/package';
 import pool from '../../db/pool';
 import Categories from '../../db/enums/categories';
-import ErrorResponse from '../helpers/httpResponses/errorResponse';
-import PackageResponse from '../helpers/httpResponses/packageResponse';
+import HttpError from '../../models/httpModels/httpError';
+import HttpPackage from '../../models/httpModels/httpPackage';
+
 /**
  * This class handles all operations on packages. It follows 
  * both the singleton design pattern and is also a subject
@@ -45,11 +46,12 @@ export class PackageService extends Subject {
     * @param input 
     * @param output 
     * @param md 
-    * @return The id of the newly created package
+    * @return An HttpPackage that contains all of the newly created
+    * object's parameters
     */
-   async create(userId: number, name: string, category: string, 
+   public async create(userId: number, name: string, category: string, 
       description: string, input: string, output: string, md: string):
-      Promise<PackageResponse> {
+      Promise<HttpPackage> {
       
       /* Make category into a number for the database */
       const catString = this.categoryStringToNum(category);
@@ -58,17 +60,100 @@ export class PackageService extends Subject {
          const newPackage = await Package.createInstance(client, userId, name, 
             catString, description, input, output, md);
          await newPackage.save();
-         return new PackageResponse(newPackage);
+         client.release();
+         this.notify('create', newPackage);
+         return new HttpPackage(201, newPackage);
       }
       catch(err) {
-         throw new ErrorResponse(500, err.message);
+         throw new HttpError(500, 'Could not create the package specified');
       }
    }
+
+   /**
+    * Returns the package corresponding to the packageId provided
+    * @param packageId The id of the package to read
+    * @return An HttpPackage that contains all of the newly created
+    * object's parameters
+    */
+   public async read(packageId: number): Promise<HttpPackage> {
+      const client = await pool.connect();
+      try {
+         const foundPackage = await Package.getInstance(client, packageId);
+         this.notify('read', foundPackage);
+         return new HttpPackage(200, foundPackage);
+      }
+      catch(err) {
+         switch(err.message) {
+         case 'Package information could not be retrieved from database':
+            throw new HttpError(404, 'Package not found');
+         default:
+            throw new HttpError(500, 'Couldn\'t complete request');
+         }
+      }
+      finally {
+         client.release();
+      }
+   }
+
+   public async update(packageId: number, userId: number, 
+      name: string | undefined, category: string | undefined,
+      description: string | undefined, input: string | undefined, 
+      output: string | undefined, md: string | undefined)
+      : Promise<HttpPackage> {
+
+      /* Grab the current value in the database */
+      const client = await pool.connect();
+      let foundPackage: Package;
+      try {
+         foundPackage = await Package.getInstance(client, packageId);
+      }
+      catch(err) {
+         throw new HttpError(404, 'Package not found');
+      }
+
+      /* If the package userId and this userId aren't the same, throw error */
+      if (foundPackage.userId != userId) {
+         throw new HttpError(401, 'Only the owner of this package can modify it');
+      }
+
+      /* Change all params that weren't undefined */
+      if (name) {
+         foundPackage.name = name;
+      }
+      if (category) {
+         foundPackage.categoryId = this.categoryStringToNum(category);
+      }
+      if (description) {
+         foundPackage.description = description;
+      }
+      if (input) {
+         foundPackage.input = input;
+      }
+      if (output) {
+         foundPackage.output = output;
+      }
+      if (md) {
+         foundPackage.md = md;
+      }
+      if (packageId != await foundPackage.save()) {
+         throw new HttpError(500, 'Could not update the package');
+      }
+
+      this.notify('update', foundPackage);
+      return new HttpPackage(200, foundPackage);
+   }
+
+
+
    ///////////////////////////////////////////////////////////////////////////
    ///////////////////////// PRIVATE HELPER METHODS //////////////////////////
    ///////////////////////////////////////////////////////////////////////////
    
-   categoryStringToNum(category: string): number {
+   /**
+    * Returns the corresponding number for each category
+    * @param category the category as a string
+    */
+   private categoryStringToNum(category: string): number {
       switch(category) {
       case 'image':
          return Categories.IMAGE;
@@ -79,7 +164,7 @@ export class PackageService extends Subject {
       case 'audio':
          return Categories.AUDIO;
       default:
-         throw new ErrorResponse(400, 'Invalid Category name');
+         throw new HttpError(400, 'Invalid Category name');
       }
    }
 }

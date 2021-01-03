@@ -20,4 +20,10 @@ export default class HttpError extends Error {
       super(message);
       this.statusCode = statusCode;
    }
+
+   public format(): string {
+      return JSON.stringify({
+         Error: this.message
+      });
+   }
 }

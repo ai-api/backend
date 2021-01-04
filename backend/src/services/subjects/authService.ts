@@ -73,6 +73,7 @@ export class AuthService extends Subject {
     * will throw an error with the appropriate message
     * @param username the user's username
     * @param password the user's password
+    * @return will return a newly generated refreshToken
     */
    public async login(username: string, password: string): Promise<string> {
 

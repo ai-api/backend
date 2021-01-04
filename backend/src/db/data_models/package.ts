@@ -7,13 +7,13 @@ class Package {
    private sysId: number;
    private user: number;
    private lastUpdated: Date;
-   private numApiCalls: number;
+   private apiCalls: number;
    private packageName: string;
-   private category: number;
+   private categoryId: number;
    private shortDescription: string;
    private modelInput: string;
    private modelOutput: string;
-   private markdown: string;
+   private md: string;
    private updatedFields: Set<string>;
    /**
     * @param client The postgres client used to make database queries
@@ -33,13 +33,13 @@ class Package {
       this.sysId = id;
       this.user = userId;
       this.lastUpdated = lastUpdated;
-      this.numApiCalls = numApiCalls;
+      this.apiCalls = numApiCalls;
       this.packageName = name;
-      this.category = category;
+      this.categoryId = category;
       this.shortDescription = description;
       this.modelInput = input;
       this.modelOutput = output;
-      this.markdown = markdown;
+      this.md = markdown;
       this.client = client;
       this.tableName = TableNames.PACKAGE;
       this.updatedFields = new Set();
@@ -104,8 +104,8 @@ class Package {
       this.setLastUpdated();
       const columnNames: Array<string> = ['userId', 'lastUpdated','numApiCalls','name',
          'category', 'description', 'input', 'output', 'markdown'];
-      const columnValues: Array<unknown> = [ this.user, this.lastUpdated, this.numApiCalls, this.packageName,
-         this.category, this.shortDescription, this.modelInput, this.modelOutput, this.markdown];
+      const columnValues: Array<unknown> = [ this.user, this.lastUpdated, this.apiCalls, this.packageName,
+         this.categoryId, this.shortDescription, this.modelInput, this.modelOutput, this.md];
       const id = await dbCreate(this.client, this.tableName, columnNames, columnValues);
       this.setId(id);
       if(!id)
@@ -204,8 +204,8 @@ class Package {
     * Gets the number of times the package model was requested
     * @return number of API calls made to the package
     */
-   public get apiCalls(): number{
-      return this.numApiCalls;
+   public get numApiCalls(): number{
+      return this.apiCalls;
    }
 
    /**
@@ -232,18 +232,18 @@ class Package {
     * Gets the category ID of the package
     * @returns category ID associated with the package
     */
-   public get categoryId(): number{
-      return this.category;
+   public get category(): number{
+      return this.categoryId;
    }
 
    /**
     * Changes the category ID associated with the package
     * @param newCategory The new category to change to
     */
-   public set categoryId(newCategory: number){
+   public set category(newCategory: number){
       if(newCategory <= 0)
          throw new Error('New category ID is invalid');
-      this.category = newCategory;
+      this.categoryId = newCategory;
       this.updatedFields.add('category');
    }
 
@@ -308,18 +308,18 @@ class Package {
     * Gets the raw markdown of the package
     * @return package markdown
     */
-   public get md(): string{
-      return this.markdown;
+   public get markdown(): string{
+      return this.md;
    }
 
    /**
     * Changes the mardown of the package
     * @param newName The new markdown to change to
     */
-   public set md(newMarkdown:string){
+   public set markdown(newMarkdown:string){
       if(!newMarkdown)
          throw new Error('New markdown is Invalid');
-      this.markdown = newMarkdown;
+      this.md = newMarkdown;
       this.updatedFields.add('markdown');
       
    }

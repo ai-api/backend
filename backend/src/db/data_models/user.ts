@@ -8,7 +8,7 @@ class User {
    private pass: string;
    private emailAddress: string;
    private key: string;
-   private profilePicture: string;
+   private picture: string;
    private client: PoolClient;
    private updatedFields: Set<string>;
    private tableName: string;
@@ -20,7 +20,7 @@ class User {
       this.emailAddress = email;
       this.key = apiKey;
       this.sysId = id;
-      this.profilePicture = profilePicture;
+      this.picture = profilePicture;
       this.updatedFields = new Set();
       this.tableName = TableNames.USER;
    }
@@ -60,7 +60,7 @@ class User {
    private async create(): Promise<number>{
       console.log('CREATING NEW USER');
       const columnNames: Array<string> = ['username', 'password','email','apiKey', 'profilePicture'];
-      const columnValues: Array<unknown> = [ this.user, this.pass, this.emailAddress, this.key, this.profilePicture];
+      const columnValues: Array<unknown> = [ this.user, this.pass, this.emailAddress, this.key, this.picture];
       const id = await dbCreate(this.client, this.tableName, columnNames, columnValues);
       this.setId(id);
       if(!id)
@@ -163,11 +163,11 @@ class User {
       this.key = newApiKey;
    }
 
-   public get picture(): string{
-      return this.profilePicture;
+   public get profilePicture(): string{
+      return this.picture;
    }
 
-   public set picture(newPicture: string){
+   public set profilePicture(newPicture: string){
       if(!newPicture)
          throw new Error('New profile picture URL is invalid');
       this.updatedFields.add('profilePicture');

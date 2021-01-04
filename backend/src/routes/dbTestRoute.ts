@@ -98,11 +98,11 @@ router.get('/updatePackage',(req, res, next)=>{
       const id = 11;
       Package.getInstance(client, id)
          .then(testPackage =>{
-            testPackage.categoryId = 2;
+            testPackage.category = 2;
             testPackage.description = 'new description';
             testPackage.input = 'new input';
             testPackage.output = 'new output';
-            testPackage.md = 'new markdown';
+            testPackage.markdown = 'new markdown';
             testPackage.name = 'new name';
             testPackage.userId = 99;
             testPackage.save()

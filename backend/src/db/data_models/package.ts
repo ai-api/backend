@@ -86,19 +86,22 @@ class Package {
     * one exists, otherwise create a new Package entry in the database
     * @return A promise which resolves to a number. The package ID
     * is returned on a successful save, 0 is returned if the postgres
-    * client can't save the object, -1 is returned if an error occurs
+    * client can't save the object
     */
    public async save(): Promise<number>{
-      if(this.sysId >= 1)
-         return await this.update();
-      return await this.create();
+      try{
+         if(this.sysId >= 1)
+            return await this.update();
+         return await this.create();
+      }catch(err){
+         throw new Error(err);
+      }
    }
    /**
     * Creates a new package entry in the package table using
     * the fields in the current object
     * @return A promise which resolves to a number. The package ID
-    * is returned on a successful insert, 0 is returned if the postgres
-    * client can't insert the object, -1 is returned if an error occurs
+    * is returned on a successful insert
     */
    private async create(): Promise<number>{
       this.setLastUpdated();
@@ -108,7 +111,7 @@ class Package {
          this.categoryId, this.shortDescription, this.modelInput, this.modelOutput, this.md];
       const id = await dbCreate(this.client, this.tableName, columnNames, columnValues);
       this.setId(id);
-      if(!id)
+      if(id < 1)
          throw new Error('Package could not be created');
       return id;
    }
@@ -118,7 +121,7 @@ class Package {
     * altered fields in the current object
     * @return A promise which resolves to a number. The package ID
     * is returned on a successful update, 0 is returned if the postgres
-    * client can't update the object, -1 is returned if an error occurs
+    * client can't update the object
     */
    private async update(): Promise<number>{
       if(this.updatedFields.size == 0)
@@ -130,7 +133,10 @@ class Package {
          columnNames.push(fieldName);
          columnValues.push(this[fieldName as keyof Package]);
       });
-      return await dbUpdate(this.client, this.tableName, columnNames, columnValues, this.sysId);
+      const id = await dbUpdate(this.client, this.tableName, columnNames, columnValues, this.sysId);
+      if(id < 1)
+         throw new Error('Package could not be updated');
+      return id;
    }
 
    /**
@@ -140,11 +146,12 @@ class Package {
     * or -1 otherwise
     */
    public async delete(): Promise<number>{
-      if(this.sysId >= 1){
-         await dbRemove(this.client, this.tableName, this.sysId);
-         return 0;
+      if(this.sysId < 1){
+         throw new Error('Delete failed. Invalid ID');
       }
-      return -1;
+      await dbRemove(this.client, this.tableName, this.sysId);
+      this.sysId = -1;
+      return 0;
    }
    
    /**
@@ -176,12 +183,10 @@ class Package {
     * Changes the user ID associated with the package
     */
    public set userId(newId: number){
-      if(newId >= 1){
-         this.user = newId;
-         this.updatedFields.add('userId');
-         return;
-      }
-      throw new Error('Invalid ID number');
+      if(newId < 1)
+         throw new Error('Invalid ID number');
+      this.user = newId;
+      this.updatedFields.add('userId');
    }
 
    /**

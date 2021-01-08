@@ -46,9 +46,13 @@ class User {
     * client can't save the object, -1 is returned if an error occurs
     */
    public async save(): Promise<number>{
-      if(this.sysId >= 1)
-         return await this.update();
-      return await this.create();
+      try{
+         if(this.sysId >= 1)
+            return await this.update();
+         return await this.create();
+      }catch(err){
+         throw new Error(err);
+      }
    }
    /**
     * Creates a new User entry in the User table using
@@ -76,7 +80,6 @@ class User {
     * client can't update the object, -1 is returned if an error occurs
     */
    private async update(): Promise<number>{
-      console.log('UPDATING EXISTING PACKAGE');
       if(this.updatedFields.size == 0)
          return 0;
       const columnNames: Array<string> = [];
@@ -85,7 +88,10 @@ class User {
          columnNames.push(fieldName);
          columnValues.push(this[fieldName as keyof User]);
       });
-      return await dbUpdate(this.client, this.tableName, columnNames, columnValues, this.sysId);
+      const id = await dbUpdate(this.client, this.tableName, columnNames, columnValues, this.sysId);
+      if(id < 1)
+         throw new Error('Package could not be updated');
+      return id;
    }
 
    /**
@@ -95,11 +101,12 @@ class User {
     * or -1 otherwise
     */
    public async delete(): Promise<number>{
-      if(this.sysId >= 1){
-         await dbRemove(this.client, this.tableName, this.sysId);
-         return 0;
+      if(this.sysId < 1){
+         throw new Error('Delete failed. Invalid ID');
       }
-      return -1;
+      await dbRemove(this.client, this.tableName, this.sysId);
+      this.sysId = -1;
+      return 0;
    }
 
    /**
@@ -126,8 +133,8 @@ class User {
    public set username(newUsername: string){
       if(!newUsername)
          throw new Error('New username is invalid');
-      this.updatedFields.add('username');
       this.user = newUsername;
+      this.updatedFields.add('username');
    }
 
    public get password(): string{
@@ -137,8 +144,8 @@ class User {
    public set password(newPassword: string){
       if(!newPassword)
          throw new Error('New password is invalid');
-      this.updatedFields.add('password');
       this.pass = newPassword;
+      this.updatedFields.add('password');
    }
 
    public get email(): string{
@@ -148,8 +155,8 @@ class User {
    public set email(newEmail: string){
       if(!newEmail)
          throw new Error('New email is invalid');
-      this.updatedFields.add('email');
       this.emailAddress = newEmail;
+      this.updatedFields.add('email');
    }
 
    public get apiKey(): string{
@@ -159,8 +166,8 @@ class User {
    public set apiKey(newApiKey: string){
       if(!newApiKey)
          throw new Error('New API key is invalid');
-      this.updatedFields.add('apiKey');
       this.key = newApiKey;
+      this.updatedFields.add('apiKey');
    }
 
    public get profilePicture(): string{
@@ -170,8 +177,8 @@ class User {
    public set profilePicture(newPicture: string){
       if(!newPicture)
          throw new Error('New profile picture URL is invalid');
-      this.updatedFields.add('profilePicture');
       this.picture = newPicture;
+      this.updatedFields.add('profilePicture');
    }
 }
 // id SERIAL PRIMARY KEY,

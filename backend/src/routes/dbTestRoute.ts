@@ -1,7 +1,9 @@
 import express from 'express';
 import Package from '../db/data_models/package';
+import User from '../db/data_models/user';
 import { Client, Pool } from 'pg';
 import config from '../config/config';
+import { userInfo } from 'os';
 
 const router = express.Router();
 
@@ -17,26 +19,6 @@ const pool = new Pool({
 
 router.get('/',(req, res, next)=>{
    res.send('Database Testing Router');
-});
-
-/* Show all entries of a particular table */
-router.get('/listTable', (req, res)=>{
-   
-   pool.connect((err, client, done) =>{
-      if(err){
-         // Release the client and log the error
-         client.release();
-         console.log(err);
-      }
-      const tableName = 'package';
-      const queryText = `SELECT * FROM ${tableName}`; 
-      client.query(queryText)
-         .then(queryResult=>{
-            // Release the client resource
-            client.release();
-            res.json(JSON.stringify(queryResult.rows));
-         });
-   });
 });
 
 /* Test Create Package */
@@ -132,6 +114,102 @@ router.get('/deletePackage',(req, res, next)=>{
                   // Release the client resource
                   client.release();
                   res.json(`Package ${id} Successfully Deleted`);
+               });
+         });
+   });
+});
+
+/* Test Create Package */
+router.get('/createUser',(req, res, next)=>{
+   // Checkout a client from the pool
+   pool.connect((err, client, done) =>{
+      if(err){
+         // Release the client and log the error
+         client.release();
+         console.log(err);
+      } 
+      // Create test package object
+      const testUser: User = User.createInstance(client, 'username', 'password', 'email@email.com', 'APIKEY', 'someurl.com');
+      console.log(testUser);
+      // Insert package object into package table
+      testUser.save()
+         .then(id=>{
+            // Release the client resource
+            client.release();
+            res.send(`Created a New User with ID=${id}`); 
+         });
+   });
+});
+
+/* Test Read Package */
+router.get('/readUser',(req, res, next)=>{
+   // Checkout a client from the pool
+   pool.connect((err, client, done) =>{
+      if(err){
+         // Release the client and log the error
+         client.release();
+         console.log(err);
+      } 
+      // initialize a package object
+      const id = 5;
+      User.getInstance(client, id)
+         .then(resultUser =>{
+            client.release();
+            res.json(JSON.stringify(resultUser));
+         })
+         .catch(err=>{
+            client.release();
+            res.json(err);
+         });
+   });
+});
+
+/* Test Update Package */
+router.get('/updateUser',(req, res, next)=>{
+   // Checkout a client from the pool
+   pool.connect((err, client, done) =>{
+      if(err){
+         // Release the client and log the error
+         client.release();
+         console.log(err);
+      } 
+ 
+      // initialize a package object
+      const id = 5;
+      User.getInstance(client, id)
+         .then(testUser =>{
+            testUser.username = 'new username';
+            testUser.password = 'new password';
+            testUser.email = 'newemail@email.com';
+            testUser.apiKey = 'NEWAPIKEY';
+            testUser.profilePicture = 'newurl.com';
+            testUser.save()
+               .then(() =>{
+                  // Release the client resource
+                  client.release();
+                  res.json(`User ${id} Updated Successfully`);
+               });
+         });
+   });
+});
+
+/* Test Remove Package */
+router.get('/deleteUser',(req, res, next)=>{
+   // Checkout a client from the pool
+   pool.connect((err, client, done) =>{
+      if(err){
+         // Release the client and log the error
+         client.release();
+         console.log(err);
+      } 
+      const id = 5;
+      User.getInstance(client, id)
+         .then(testUser =>{
+            testUser.delete()
+               .then(() =>{
+                  // Release the client resource
+                  client.release();
+                  res.json(`User ${id} Successfully Deleted`);
                });
          });
    });

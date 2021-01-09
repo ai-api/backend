@@ -53,7 +53,7 @@ router.get('/readPackage',(req, res, next)=>{
          console.log(err);
       } 
       // initialize a package object
-      const id = 11;
+      const id = 5;
       Package.getInstance(client, id)
          .then(resultPackage =>{
             client.release();
@@ -77,7 +77,7 @@ router.get('/updatePackage',(req, res, next)=>{
       } 
  
       // initialize a package object
-      const id = 11;
+      const id = 5;
       Package.getInstance(client, id)
          .then(testPackage =>{
             testPackage.category = 2;
@@ -106,14 +106,14 @@ router.get('/deletePackage',(req, res, next)=>{
          client.release();
          console.log(err);
       } 
-      const id = 11;
+      const id = 5;
       Package.getInstance(client, id)
          .then(testPackage =>{
             testPackage.delete()
-               .then(() =>{
+               .then((result) =>{
                   // Release the client resource
                   client.release();
-                  res.json(`Package ${id} Successfully Deleted`);
+                  res.json(`Package ${id} Successfully Deleted with result ${result}`);
                });
          });
    });
@@ -151,7 +151,7 @@ router.get('/readUser',(req, res, next)=>{
          console.log(err);
       } 
       // initialize a package object
-      const id = 5;
+      const id = 7;
       User.getInstance(client, id)
          .then(resultUser =>{
             client.release();
@@ -175,7 +175,7 @@ router.get('/updateUser',(req, res, next)=>{
       } 
  
       // initialize a package object
-      const id = 5;
+      const id = 7;
       User.getInstance(client, id)
          .then(testUser =>{
             testUser.username = 'new username';
@@ -202,7 +202,7 @@ router.get('/deleteUser',(req, res, next)=>{
          client.release();
          console.log(err);
       } 
-      const id = 5;
+      const id = 7;
       User.getInstance(client, id)
          .then(testUser =>{
             testUser.delete()

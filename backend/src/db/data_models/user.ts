@@ -62,7 +62,6 @@ class User {
     * client can't insert the object, -1 is returned if an error occurs
     */
    private async create(): Promise<number>{
-      console.log('CREATING NEW USER');
       const columnNames: Array<string> = ['username', 'password','email','apiKey', 'profilePicture'];
       const columnValues: Array<unknown> = [ this.user, this.pass, this.emailAddress, this.key, this.picture];
       const id = await dbCreate(this.client, this.tableName, columnNames, columnValues);
@@ -101,10 +100,11 @@ class User {
     * or -1 otherwise
     */
    public async delete(): Promise<number>{
-      if(this.sysId < 1){
-         throw new Error('Delete failed. Invalid ID');
-      }
-      await dbRemove(this.client, this.tableName, this.sysId);
+      if(this.sysId < 1)
+         return -1;
+      const returnStatus = await dbRemove(this.client, this.tableName, this.sysId);
+      if(returnStatus == -1)
+         throw new Error('Delete Failed');
       this.sysId = -1;
       return 0;
    }

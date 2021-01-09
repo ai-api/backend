@@ -146,10 +146,11 @@ class Package {
     * or -1 otherwise
     */
    public async delete(): Promise<number>{
-      if(this.sysId < 1){
-         throw new Error('Delete failed. Invalid ID');
-      }
-      await dbRemove(this.client, this.tableName, this.sysId);
+      if(this.sysId < 1)
+         return -1;
+      const returnStatus = await dbRemove(this.client, this.tableName, this.sysId);
+      if(returnStatus == -1)
+         throw new Error('Delete Failed');
       this.sysId = -1;
       return 0;
    }

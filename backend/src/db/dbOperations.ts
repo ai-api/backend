@@ -66,9 +66,7 @@ export async function dbCreate(client: PoolClient, tableName: string, columnName
          text: insertIntoTable(tableName, columnNames),
          values: columnValues
       };
-      console.log('QUERYPARAMS: ', queryParams);
       const res = await client.query(queryParams);
-      console.log('createPackage RESULT: ', res);
       return res.rows[0].id;
    }catch(err){
       console.log('ERROR: createPackage Failed. ' + err);
@@ -93,9 +91,7 @@ export async function dbUpdate(client: PoolClient, tableName: string, columnName
          text: updateById(tableName, columnNames, id),
          values: columnValues
       };
-      console.log('QUERYPARAMS: ', queryParams);
       const res = await client.query(queryParams);
-      console.log('Update RESULT: ', res);
       // Return success code
       return id;
    }catch(err){
@@ -119,7 +115,6 @@ export async function dbReadById(client: PoolClient, tableName: string, id: numb
    };
    try{
       const res = await client.query(queryParams);
-      console.log(res);
       return res.rows[0];
    }catch(err){
       console.log('ERROR: read Failed. ' + err);

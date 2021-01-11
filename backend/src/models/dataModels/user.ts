@@ -1,6 +1,6 @@
 import { PoolClient } from 'pg';
-import {dbCreate, dbReadById, dbUpdate, dbRemove} from '../dbOperations';
-import TableNames from '../enums/tableNames';
+import {dbCreate, dbReadById, dbUpdate, dbRemove} from '../../db/dbOperations';
+import TableNames from '../../db/enums/tableNames';
 
 class User {
    private sysId: number;
@@ -181,10 +181,4 @@ class User {
       this.updatedFields.add('profilePicture');
    }
 }
-// id SERIAL PRIMARY KEY,
-// username varchar NOT NULL,
-// password varchar NOT NULL,
-// email varchar NOT NULL,
-// apiKey varchar NOT NULL,
-// profilePicture varchar
 export default User;

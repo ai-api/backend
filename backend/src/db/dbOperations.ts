@@ -1,6 +1,6 @@
 import { Client, PoolClient } from 'pg';
 import TableNames from './enums/tableNames';
-import Package from './data_models/package';
+import Package from '../models/dataModels/package';
 
 /**
  * SQL queries with parameters require a string which denotes
@@ -108,6 +108,7 @@ export async function dbUpdate(client: PoolClient, tableName: string, columnName
  * @return A promise which resolves to a valid SQL query object or null otherwise
  */
 export async function dbReadById(client: PoolClient, tableName: string, id: number): Promise<any|null>{
+   console.log('id: ' + id);
    const queryParams = {
       text: `SELECT * FROM ${tableName} WHERE id = $1`,
       values: [id]

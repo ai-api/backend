@@ -7,9 +7,10 @@ import parseJwk from 'jose/jwk/parse';
 import EncryptJWT from 'jose/jwt/encrypt';
 import jwtDecrypt from 'jose/jwt/decrypt';
 import config from '../../config/config';
+import HttpError from '../../models/httpModels/httpError';
 
 /**
- * Description. This class contains all functions that relate to
+ * This class contains all functions that relate to
  * authorizing users. It follows both the singleton design pattern,
  * and is also a subject that other classes/objects can subscribe to
  */
@@ -37,9 +38,9 @@ export class AuthService extends Subject {
    }
 
    /**
-    * Will return the instance of the UserService 
-    * if it already exists. If it doesn't exist, will create a
-    * new instance and return that
+    * Will return the instance of the AuthService if
+    * it already exists. If it doesn't exist, will create
+    * a new instance and return that
     */
    public static getInstance(): AuthService {
       if (!AuthService.instance) {
@@ -72,17 +73,18 @@ export class AuthService extends Subject {
     * will throw an error with the appropriate message
     * @param username the user's username
     * @param password the user's password
+    * @return will return a newly generated refreshToken
     */
    public async login(username: string, password: string): Promise<string> {
 
       const user = users.get(username);
       if (!user) {
          this.notify('loginFail', user);
-         throw new Error('Invalid Username');
+         throw new HttpError(401, 'Invalid Username');
       }
       if (user.password != password) {
          this.notify('loginFail', user);
-         throw new Error('Invalid Password');
+         throw new HttpError(401, 'Invalid Password');
       }
       const refreshToken = this.genRefreshToken();
       refreshTokens.set(refreshToken, user.id);
@@ -93,12 +95,19 @@ export class AuthService extends Subject {
     * Will try to delete refresh token from the database. If refresh
     * token does not exist, will throw an error with the appropriate
     * message
+    * TODO: Allow users to be logged out globally
+    * 
+    * @param userId The user's id
     * @param token The user's refresh token
+    * @param global True if the user wishes to log out from all devices
     */
-   public logout(token: string): void {
+   public async logout(userId: number, token: string, global: boolean): Promise<void> {
+      if (refreshTokens.get(token) != userId) {
+         throw new HttpError(404, 'This refresh token was not found for user on the server');
+      }
       if (!refreshTokens.delete(token)) {
          //this.notify('logoutFail', )
-         throw new Error('Refresh Token not found on server');
+         throw new HttpError(404, 'Refresh Token not found on server');
       }
    }
 
@@ -113,7 +122,7 @@ export class AuthService extends Subject {
       const userId = refreshTokens.get(token);
       if (userId == undefined) {
          this.notify('refreshFail', user); // TODO: Properly grab user object
-         throw new Error('Refresh Token not found on server');
+         throw new HttpError(401, 'Refresh Token not found on server');
       }
 
       const payload = {

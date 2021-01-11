@@ -1,6 +1,7 @@
 import { PoolClient } from 'pg';
-import {dbCreate, dbReadById, dbUpdate, dbRemove} from '../dbOperations';
-import TableNames from '../enums/tableNames';
+import {dbCreate, dbReadById, dbUpdate, dbRemove} from '../../db/dbOperations';
+import TableNames from '../../db/enums/tableNames';
+import HttpPackage from '../httpModels/httpPackage';
 class Package {
    private client: PoolClient;
    private tableName: string;
@@ -15,6 +16,7 @@ class Package {
    private modelOutput: string;
    private md: string;
    private updatedFields: Set<string>;
+
    /**
     * @param client The postgres client used to make database queries
     * @param userId: The user's unique ID number
@@ -54,6 +56,7 @@ class Package {
     */
    public static async getInstance(client: PoolClient, id: number): Promise<Package>{
       const data = await dbReadById(client, TableNames.PACKAGE, id);
+      console.log(data);
       if(data)
          return new Package(client, data.userid, data.name, data.category, data.description, data.input,
             data.output, data.markdown, data.id, data.lastupdated, data.numapicalls);
@@ -76,9 +79,7 @@ class Package {
    public static createInstance(client: PoolClient, userId: number, name: string, category: number, description: string, 
       input: string, output: string, markdown = ''): Package{
 
-      if(client && userId && name && category && description && input && output)
-         return new Package(client, userId, name, category, description, input, output, markdown);
-      throw new Error('One or more invalid method arguments');
+      return new Package(client, userId, name, category, description, input, output, markdown);
    }
 
    /**
@@ -97,6 +98,7 @@ class Package {
          throw new Error(err);
       }
    }
+
    /**
     * Creates a new package entry in the package table using
     * the fields in the current object
@@ -110,9 +112,9 @@ class Package {
       const columnValues: Array<unknown> = [ this.user, this.lastUpdated, this.apiCalls, this.packageName,
          this.categoryId, this.shortDescription, this.modelInput, this.modelOutput, this.md];
       const id = await dbCreate(this.client, this.tableName, columnNames, columnValues);
-      this.setId(id);
       if(id < 1)
          throw new Error('Package could not be created');
+      this.setId(id);
       return id;
    }
 

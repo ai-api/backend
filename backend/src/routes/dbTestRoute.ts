@@ -1,20 +1,12 @@
 import express from 'express';
-import Package from '../db/data_models/package';
-import User from '../db/data_models/user';
+import Package from '../models/dataModels/package';
+import User from '../models/dataModels/user';
 import { Client, Pool } from 'pg';
 import config from '../config/config';
-import { userInfo } from 'os';
-
+import pool from '../db/pool';
 const router = express.Router();
 
-/* Create a postgres pool*/
-const pool = new Pool({
-   user: config.db.username,
-   host: config.db.ip,
-   database: config.db.name,
-   password: config.db.password,
-   port: config.db.port
-});
+
  
 
 router.get('/',(req, res, next)=>{

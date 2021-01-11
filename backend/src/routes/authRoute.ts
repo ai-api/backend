@@ -2,16 +2,16 @@ import express from 'express';
 import { celebrate, Joi, Segments } from 'celebrate';
 import regexTokens from '../config/regexTokens';
 import { AuthService } from '../services/subjects/authService';
-
-/////////////////////////////////////////////
-////////////////// CONFIG ///////////////////
-/////////////////////////////////////////////
+import HttpError from '../models/httpModels/httpError';
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////// CONFIG //////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 
 const router = express.Router();
 const authService = AuthService.getInstance();
-/////////////////////////////////////////////
-////////////////// ROUTES ///////////////////
-/////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////// ROUTES //////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 
 /**
  * Logs the user in by generating
@@ -20,7 +20,6 @@ const authService = AuthService.getInstance();
  * Response:
  * 200 OK on success, returns a refreshToken
  * 401 Auth Failed if incorrect pass/login
- * 
  */
 router.post('/', celebrate({
    [Segments.BODY]: Joi.object().keys({
@@ -37,8 +36,8 @@ router.post('/', celebrate({
             'refreshToken': refreshToken
          });
       })
-      .catch((err) => {
-         res.status(401).json({
+      .catch((err: HttpError) => {
+         res.status(err.statusCode).json({
             'Error': err.message
          });
       });
@@ -74,8 +73,8 @@ router.post('/refresh', celebrate({
             'jwt': jwt
          });
       })
-      .catch((err: Error) => {
-         res.status(401).json({
+      .catch((err: HttpError) => {
+         res.status(err.statusCode).json({
             'Error': err.message
          });
          return;
@@ -94,8 +93,22 @@ router.delete('/', celebrate({
       global: Joi.bool().optional()
    }).unknown(),
 }), (req,res) => {
-   res.json('TODO: Not yet implemented');
+
+   const refreshToken = req.body.refreshToken;
+   const global = req.body.global;
+   const userId = req.userId;
+   authService.logout(userId, refreshToken, global)
+      .then(() => {
+         res.status(200).send();
+      })
+      .catch((err: HttpError) => {
+         res.status(err.statusCode).json({
+            'Error': err.message
+         });
+      });
+ 
 });
+
 
 /**
  * Export the router so we can use it

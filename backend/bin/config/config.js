@@ -1,43 +1,43 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var dotenv = __importStar(require("dotenv"));
-/* Read the .env from the root directory of the git */
-dotenv.config({ path: __dirname + '/../../../.env' });
-var dev = {
-    'port': '8000',
+const dev = {
+    'port': '8080',
     'db': {
-        'name': process.env.DB_NAME || 'config error',
-        'username': process.env.DB_USERNAME || 'config error',
-        'password': process.env.DB_PASSWORD || 'config error',
-        'port': process.env.DB_PORT_EXTERNAL || 'config error'
+        'name': 'aiapi',
+        'username': 'admin',
+        'password': 'c0cac0la',
+        'ip': 'localhost',
+        'port': 7979
+    },
+    'ts': {
+        'ip': 'localhost',
+        'port': 7777
+    },
+    'auth': {
+        'alg': 'A256KW',
+        'enc': 'A256GCM',
+        'iss': 'aiapi.app',
+        'aud': 'aiapi.app'
     }
 };
-var prod = {
+const prod = {
     'port': '80',
     'db': {
-        'name': process.env.DB_NAME || 'config error',
-        'username': process.env.DB_USERNAME || 'config error',
-        'password': process.env.DB_PASSWORD || 'config error',
-        'port': process.env.DB_PORT_INTERNAL || 'config error'
+        'name': 'aiapi',
+        'username': 'admin',
+        'password': 'c0cac0la',
+        'ip': 'db',
+        'port': 5432
+    },
+    'ts': {
+        'ip': 'ts',
+        'port': 8501,
+    },
+    'auth': {
+        'alg': 'A256KW',
+        'enc': 'A256GCM',
+        'iss': 'aiapi.app',
+        'aud': 'aiapi.app'
     }
 };
 /**

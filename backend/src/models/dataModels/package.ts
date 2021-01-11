@@ -1,6 +1,7 @@
 import { PoolClient } from 'pg';
-import {dbCreate, dbReadById, dbUpdate, dbRemove} from '../dbOperations';
-import TableNames from '../enums/tableNames';
+import {dbCreate, dbReadById, dbUpdate, dbRemove} from '../../db/dbOperations';
+import TableNames from '../../db/enums/tableNames';
+import HttpPackage from '../httpModels/httpPackage';
 class Package {
    private client: PoolClient;
    private tableName: string;
@@ -15,6 +16,7 @@ class Package {
    private modelOutput: string;
    private markdown: string;
    private updatedFields: Set<string>;
+
    /*
     * @userId: The user's unique ID number
     * @name: The name of the package
@@ -53,6 +55,7 @@ class Package {
     */
    public static async getInstance(client: PoolClient, id: number): Promise<Package>{
       const data = await dbReadById(client, TableNames.PACKAGE, id);
+      console.log(data);
       if(data)
          return new Package(client, data.userid, data.name, data.category, data.description, data.input,
             data.output, data.markdown, data.id, data.lastupdated, data.numapicalls);
@@ -75,9 +78,7 @@ class Package {
    public static createInstance(client: PoolClient, userId: number, name: string, category: number, description: string, 
       input: string, output: string, markdown = ''): Package{
 
-      if(client && userId && name && category && description && input && output)
-         return new Package(client, userId, name, category, description, input, output, markdown);
-      throw new Error('One or more invalid method arguments');
+      return new Package(client, userId, name, category, description, input, output, markdown);
    }
 
    /**
@@ -88,10 +89,11 @@ class Package {
     * client can't save the object, -1 is returned if an error occurs
     */
    public async save(): Promise<number>{
-      if(this.sysId >= 1)
+      if(this.sysId >= 1) 
          return await this.update();
       return await this.create();
    }
+
    /**
     * Creates a new package entry in the package table using
     * the fields in the current object
@@ -106,7 +108,12 @@ class Package {
          'category', 'description', 'input', 'output', 'markdown'];
       const columnValues: Array<unknown> = [ this.user, this.lastUpdated, this.numApiCalls, this.packageName,
          this.category, this.shortDescription, this.modelInput, this.modelOutput, this.markdown];
-      return await dbCreate(this.client, this.tableName, columnNames, columnValues);
+      const id = await dbCreate(this.client, this.tableName, columnNames, columnValues);
+      if (id < 1) {
+         throw new Error('Couldn\'t create in database');
+      }
+      this.setId(id);
+      return id;
    }
 
    /**
@@ -150,6 +157,14 @@ class Package {
     */
    public get idNum(): number{
       return this.sysId;
+   }
+
+   private setId(id: number): void {
+      if (id) {
+         this.sysId = id;
+         return;
+      }
+      throw new Error('Can\'t set Id');
    }
 
    /**

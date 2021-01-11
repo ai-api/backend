@@ -121,7 +121,7 @@ export class PackageService extends Subject {
          foundPackage.name = name;
       }
       if (category) {
-         foundPackage.categoryId = this.categoryStringToNum(category);
+         foundPackage.category = this.categoryStringToNum(category);
       }
       if (description) {
          foundPackage.description = description;
@@ -133,7 +133,7 @@ export class PackageService extends Subject {
          foundPackage.output = output;
       }
       if (md) {
-         foundPackage.md = md;
+         foundPackage.markdown = md;
       }
       if (packageId != await foundPackage.save()) {
          throw new HttpError(500, 'Could not update the package');

@@ -19,15 +19,15 @@ export default class HttpPackage {
 
    public constructor(statusCode: number, pack: Package) {
       this.statusCode = statusCode;
-      this.id = pack.idNum;
+      this.id = pack.id;
       this.userId = pack.userId;
       this.dateLastUpdated = pack.dateLastUpdated;
       this.name = pack.name;
-      this.category = this.catNumToString(pack.categoryId);
+      this.category = this.catNumToString(pack.category);
       this.description = pack.description;
       this.input = pack.input;
       this.output = pack.output;
-      this.markdown = pack.md;
+      this.markdown = pack.markdown;
    }
 
    public format(): string {

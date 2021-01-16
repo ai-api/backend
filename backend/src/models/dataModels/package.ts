@@ -78,7 +78,6 @@ class Package {
     */
    public static createInstance(client: PoolClient, userId: number, name: string, category: number, description: string, 
       input: string, output: string, markdown = ''): Package{
-
       return new Package(client, userId, name, category, description, input, output, markdown);
    }
 
@@ -170,7 +169,7 @@ class Package {
     */
    private setId(newId: number): void{
       if(newId <= 0)
-         throw new Error('New ID is invalid');
+         throw new Error('New ID is Invalid');
       this.sysId = newId;
    }
 

@@ -17,10 +17,13 @@ export default class PackageFlag {
       this.updatedFields = new Set();
       this.tableName = TableNames.PACKAGE_FLAG;
    }
-   /*
-   public static async getInstance(client: PoolClient, id: number){
-
-   }*/
+   
+   public static async getInstance(client: PoolClient, id: number): Promise<PackageFlag>{
+      const data = await dbReadById(client, TableNames.PACKAGE_FLAG, id);
+      if(!data)
+         throw new Error('PackageFlag information could not be retrieved from database');
+      return new PackageFlag(client, data.flagid, data.packageid, data.id);
+   }
 
    public static createInstance(client: PoolClient, flagId: number, packageId: number): PackageFlag{
       if(flagId < 1 && packageId < 1)

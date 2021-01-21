@@ -1,6 +1,7 @@
 import { PoolClient } from 'pg';
 import {dbCreate, dbReadById, dbUpdate, dbRemove} from '../../db/dbOperations';
 import TableNames from '../../db/enums/tableNames';
+import PackageFlag from './packageFlag';
 import HttpPackage from '../httpModels/httpPackage';
 class Package {
    private client: PoolClient;
@@ -14,6 +15,7 @@ class Package {
    private shortDescription: string;
    private modelInput: string;
    private modelOutput: string;
+   private packageFlags: Array<number>;
    private md: string;
    private updatedFields: Set<string>;
 
@@ -31,7 +33,7 @@ class Package {
     * @param numApiCalls (Optional) Number of times this package's model was requested. Defaults to 0
     */
    private constructor(client: PoolClient, userId: number, name: string, category: number, description: string, input: string, 
-      output: string, markdown = '', id = -1, lastUpdated = new Date(), numApiCalls = 0){
+      output: string, flags: Array<number>, markdown = '', id = -1, lastUpdated = new Date(), numApiCalls = 0){
       this.sysId = id;
       this.user = userId;
       this.lastUpdated = lastUpdated;
@@ -41,6 +43,7 @@ class Package {
       this.shortDescription = description;
       this.modelInput = input;
       this.modelOutput = output;
+      this.packageFlags = flags;
       this.md = markdown;
       this.client = client;
       this.tableName = TableNames.PACKAGE;
@@ -77,8 +80,8 @@ class Package {
     * @return A Package object
     */
    public static createInstance(client: PoolClient, userId: number, name: string, category: number, description: string, 
-      input: string, output: string, markdown = ''): Package{
-      return new Package(client, userId, name, category, description, input, output, markdown);
+      input: string, output: string, flags: Array<number>, markdown = ''): Package{
+      return new Package(client, userId, name, category, description, input, output, flags, markdown);
    }
 
    /**

@@ -143,3 +143,16 @@ export async function dbRemove(client: PoolClient, tableName: string, id: number
    }
 }
 
+export async function dbReadPackageFlag(client: PoolClient, packageId: number): Promise<any|null>{
+   const queryParams = {
+      text: `SELECT * FROM ${TableNames.PACKAGE_FLAG} WHERE packageId = $1`,
+      values: [packageId]
+   };
+   try{
+      const res = await client.query(queryParams);
+      return res.rows;
+   }catch(err){
+      console.log('ERROR: read operation for PackageFlag failed.', err);
+      return null;
+   }
+}

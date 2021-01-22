@@ -58,7 +58,7 @@ export class PackageService extends Subject {
       try {
          const client = await pool.connect();
          const newPackage = await Package.createInstance(client, userId, name, 
-            catString, description, input, output, md);
+            catString, description, input, output, [], md);
          await newPackage.save();
          client.release();
          this.notify('create', newPackage);

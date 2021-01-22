@@ -76,6 +76,7 @@ class Package {
     * @param description A short description of the package
     * @param input An example input for the package model
     * @param output The output of the given example input
+    * @param flags The user's flags
     * @param markdown A markdown file containing additional information
     * @return A Package object
     */

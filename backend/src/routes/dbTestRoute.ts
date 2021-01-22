@@ -23,7 +23,7 @@ router.get('/createPackage',(req, res, next)=>{
          console.log(err);
       } 
       // Create test package object
-      const testPackage: Package = Package.createInstance(client, 1, 'name', 1, 'description', 'input', 'output', 'markdown');
+      const testPackage: Package = Package.createInstance(client, 1, 'name', 1, 'description', 'input', 'output', [], 'markdown');
       console.log(testPackage);
       // Insert package object into package table
       testPackage.save()

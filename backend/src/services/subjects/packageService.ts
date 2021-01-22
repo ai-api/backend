@@ -1,10 +1,10 @@
 import { Subject } from './subject';
 import config from '../../config/config';
 import Package from '../../models/dataModels/package';
-import pool from '../../db/pool';
+import DbPool from '../../db/pool';
 import Categories from '../../db/enums/categories';
-import HttpError from '../../models/httpModels/httpError';
-import HttpPackage from '../../models/httpModels/httpPackage';
+import { HttpError } from '../../models/httpModels/httpError';
+import { HttpPackage } from '../../models/httpModels/httpPackage';
 
 /**
  * This class handles all operations on packages. It follows 
@@ -56,7 +56,7 @@ export class PackageService extends Subject {
       /* Make category into a number for the database */
       const catString = this.categoryStringToNum(category);
       try {
-         const client = await pool.connect();
+         const client = await DbPool.connect();
          const newPackage = await Package.createInstance(client, userId, name, 
             catString, description, input, output, [], md);
          await newPackage.save();
@@ -76,7 +76,7 @@ export class PackageService extends Subject {
     * object's parameters
     */
    public async read(packageId: number): Promise<HttpPackage> {
-      const client = await pool.connect();
+      const client = await DbPool.connect();
       try {
          const foundPackage = await Package.getInstance(client, packageId);
          this.notify('read', foundPackage);
@@ -102,7 +102,7 @@ export class PackageService extends Subject {
       : Promise<HttpPackage> {
 
       /* Grab the current value in the database */
-      const client = await pool.connect();
+      const client = await DbPool.connect();
       let foundPackage: Package;
       try {
          foundPackage = await Package.getInstance(client, packageId);
@@ -142,9 +142,6 @@ export class PackageService extends Subject {
       this.notify('update', foundPackage);
       return new HttpPackage(200, foundPackage);
    }
-
-
-
    ///////////////////////////////////////////////////////////////////////////
    ///////////////////////// PRIVATE HELPER METHODS //////////////////////////
    ///////////////////////////////////////////////////////////////////////////

@@ -7,7 +7,7 @@ import parseJwk from 'jose/jwk/parse';
 import EncryptJWT from 'jose/jwt/encrypt';
 import jwtDecrypt from 'jose/jwt/decrypt';
 import config from '../../config/config';
-import HttpError from '../../models/httpModels/httpError';
+import { HttpError } from '../../models/httpModels/httpError';
 
 /**
  * This class contains all functions that relate to

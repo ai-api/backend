@@ -5,7 +5,7 @@ import Categories from '../../db/enums/categories';
  * This class should be used anytime a service wants to
  * send a Package in the body of an HTTP Response. 
  */
-export default class HttpPackage {   
+export class HttpPackage {   
    public readonly id: number;
    public readonly userId : number;
    public readonly dateLastUpdated: Date;

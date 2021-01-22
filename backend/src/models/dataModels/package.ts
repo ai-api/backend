@@ -2,7 +2,6 @@ import { PoolClient } from 'pg';
 import {dbCreate, dbReadById, dbUpdate, dbRemove} from '../../db/dbOperations';
 import TableNames from '../../db/enums/tableNames';
 import PackageFlag from './packageFlag';
-import HttpPackage from '../httpModels/httpPackage';
 class Package {
    private client: PoolClient;
    private tableName: string;

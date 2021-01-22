@@ -1,8 +1,8 @@
 import express from 'express';
 import { celebrate, Joi, Segments } from 'celebrate';
 import { PackageService } from '../services/subjects/packageService';
-import HttpError from '../models/httpModels/httpError';
-import HttpPackage from '../models/httpModels/httpPackage';
+import { HttpError } from '../models/httpModels/httpError';
+import { HttpPackage } from '../models/httpModels/httpPackage';
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// CONFIG //////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////

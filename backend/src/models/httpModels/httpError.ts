@@ -4,7 +4,7 @@
  * is thrown, our routes can know exactly what status
  * code to return with
  */
-export default class HttpError extends Error {
+export class HttpError extends Error {
    readonly statusCode: number;
    
    /**

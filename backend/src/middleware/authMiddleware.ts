@@ -36,7 +36,7 @@ const noAuthRoutes = [
  * @param next The next middleware function express will call
  */
 export default async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
-
+   
    if (noAuthRoutes.some((route) => req.url == route.url && req.method == route.method)) {
       next();
       return;

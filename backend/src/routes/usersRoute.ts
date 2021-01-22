@@ -28,7 +28,16 @@ router.post('/', celebrate({
       email: Joi.string().email().required()
    }).unknown(),
 }), (req,res) => {
-   res.json('TODO: Not yet implemented');
+   const username = req.body.username;
+   const password = req.body.password;
+   const email = req.body.email;
+
+   userService.create(username, password, email)
+      .then(() => {
+         res.json('TODO: Not yet implemented');
+      });
+
+   //res.json('TODO: Not yet implemented');
 });
 
 /**

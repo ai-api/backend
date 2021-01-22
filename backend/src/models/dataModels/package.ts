@@ -1,7 +1,7 @@
 import { PoolClient } from 'pg';
 import {dbCreate, dbReadById, dbUpdate, dbRemove} from '../../db/dbOperations';
 import TableNames from '../../db/enums/tableNames';
-import HttpPackage from '../httpModels/httpPackage';
+import PackageFlag from './packageFlag';
 class Package {
    private client: PoolClient;
    private tableName: string;
@@ -14,6 +14,7 @@ class Package {
    private shortDescription: string;
    private modelInput: string;
    private modelOutput: string;
+   private packageFlags: Array<number>;
    private md: string;
    private updatedFields: Set<string>;
 
@@ -31,7 +32,7 @@ class Package {
     * @param numApiCalls (Optional) Number of times this package's model was requested. Defaults to 0
     */
    private constructor(client: PoolClient, userId: number, name: string, category: number, description: string, input: string, 
-      output: string, markdown = '', id = -1, lastUpdated = new Date(), numApiCalls = 0){
+      output: string, flags: Array<number>, markdown = '', id = -1, lastUpdated = new Date(), numApiCalls = 0){
       this.sysId = id;
       this.user = userId;
       this.lastUpdated = lastUpdated;
@@ -41,6 +42,7 @@ class Package {
       this.shortDescription = description;
       this.modelInput = input;
       this.modelOutput = output;
+      this.packageFlags = flags;
       this.md = markdown;
       this.client = client;
       this.tableName = TableNames.PACKAGE;
@@ -73,13 +75,13 @@ class Package {
     * @param description A short description of the package
     * @param input An example input for the package model
     * @param output The output of the given example input
+    * @param flags The user's flags
     * @param markdown A markdown file containing additional information
     * @return A Package object
     */
    public static createInstance(client: PoolClient, userId: number, name: string, category: number, description: string, 
-      input: string, output: string, markdown = ''): Package{
-
-      return new Package(client, userId, name, category, description, input, output, markdown);
+      input: string, output: string, flags: Array<number>, markdown = ''): Package{
+      return new Package(client, userId, name, category, description, input, output, flags, markdown);
    }
 
    /**
@@ -170,7 +172,7 @@ class Package {
     */
    private setId(newId: number): void{
       if(newId <= 0)
-         throw new Error('New ID is invalid');
+         throw new Error('New ID is Invalid');
       this.sysId = newId;
    }
 

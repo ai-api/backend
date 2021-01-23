@@ -140,6 +140,7 @@ class Package {
       const id = await dbUpdate(this.client, this.tableName, columnNames, columnValues, this.sysId);
       if(id < 1)
          throw new Error('Package could not be updated');
+      this.updatedFields.clear();
       return id;
    }
 

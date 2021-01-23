@@ -1,5 +1,5 @@
 import { PoolClient } from 'pg';
-import {dbCreate, dbReadById, dbUpdate, dbRemove} from '../../db/dbOperations';
+import {dbCreate, dbReadById, dbUpdate, dbRemove, dbReadPackageFlag} from '../../db/dbOperations';
 import TableNames from '../../db/enums/tableNames';
 import PackageFlag from './packageFlag';
 import HttpPackage from '../httpModels/httpPackage';
@@ -58,12 +58,15 @@ class Package {
     * @return A promise which resolves to a package object
     */
    public static async getInstance(client: PoolClient, id: number): Promise<Package>{
-      const data = await dbReadById(client, TableNames.PACKAGE, id);
-      console.log(data);
-      if(data)
-         return new Package(client, data.userid, data.name, data.category, data.description, data.input,
-            data.output, data.markdown, data.id, data.lastupdated, data.numapicalls);
-      throw new Error('Package information could not be retrieved from database');
+      const [packageData, flagData] = await Promise.all([dbReadById(client, TableNames.PACKAGE, id), dbReadPackageFlag(client, id)]);
+
+      if(Object.keys(packageData).length === 0 && packageData.constructor === Object)
+         throw new Error('Package information could not be retrieved from database');
+      if(flagData.length == 0)
+         throw new Error('Flags associated with given package ID could not be retrieved from database');
+      const flags = flagData.map( (flag: any) => flag.flagid);
+      return new Package(client, packageData.userid, packageData.name, packageData.category, packageData.description, packageData.input,
+         packageData.output, flags, packageData.markdown, packageData.id, packageData.lastupdated, packageData.numapicalls);
    }
 
    /**

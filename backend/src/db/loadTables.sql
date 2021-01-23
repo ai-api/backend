@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS sys_user (
     password varchar NOT NULL,
     email varchar NOT NULL,
     apiKey varchar NOT NULL,
-    profilePicture varchar
+    profilePicture varchar,
+    salt varchar NOT NULL
 );
 
 /* Create model table */

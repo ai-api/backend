@@ -10,16 +10,18 @@ class User {
    private key: string;
    private picture: string;
    private client: PoolClient;
+   private saltData: string;
    private updatedFields: Set<string>;
    private tableName: string;
 
-   private constructor(client: PoolClient, username: string, password: string, email: string, apiKey: string, id: number, profilePicture: string){
+   private constructor(client: PoolClient, username: string, password: string, email: string, apiKey: string, id: number, profilePicture: string, salt: string){
       this.client = client;
       this.user = username;
       this.pass = password;
       this.emailAddress = email;
       this.key = apiKey;
       this.sysId = id;
+      this.saltData = salt;
       this.picture = profilePicture;
       this.updatedFields = new Set();
       this.tableName = TableNames.USER;
@@ -28,13 +30,13 @@ class User {
    public static async getInstance(client: PoolClient, id: number): Promise<User>{
       const data = await dbReadById(client, TableNames.USER, id);
       if(data)
-         return new User(client, data.username, data.password, data.email, data.apikey, data.id, data.profilepicture);
+         return new User(client, data.username, data.password, data.email, data.apikey, data.id, data.profilepicture, data.salt);
       throw new Error('User information could not be retrieved from database');
    }
 
-   public static createInstance(client: PoolClient, username: string, password: string, email: string, apiKey: string, profilePicture = ''): User{
+   public static createInstance(client: PoolClient, username: string, password: string, email: string, apiKey: string, profilePicture = '', salt: string): User{
       if(client && username && password && email && apiKey)
-         return new User(client, username, password, email, apiKey, -1, profilePicture);
+         return new User(client, username, password, email, apiKey, -1, profilePicture, salt);
       throw new Error('One or more invalid method arguments');
    }
 
@@ -62,8 +64,8 @@ class User {
     * client can't insert the object, -1 is returned if an error occurs
     */
    private async create(): Promise<number>{
-      const columnNames: Array<string> = ['username', 'password','email','apiKey', 'profilePicture'];
-      const columnValues: Array<unknown> = [ this.user, this.pass, this.emailAddress, this.key, this.picture];
+      const columnNames: Array<string> = ['username', 'password','email','apiKey', 'profilePicture', 'salt'];
+      const columnValues: Array<unknown> = [ this.user, this.pass, this.emailAddress, this.key, this.picture, this.salt];
       const id = await dbCreate(this.client, this.tableName, columnNames, columnValues);
       this.setId(id);
       if(!id)
@@ -90,6 +92,7 @@ class User {
       const id = await dbUpdate(this.client, this.tableName, columnNames, columnValues, this.sysId);
       if(id < 1)
          throw new Error('Package could not be updated');
+      this.updatedFields.clear();
       return id;
    }
 
@@ -179,6 +182,17 @@ class User {
          throw new Error('New profile picture URL is invalid');
       this.picture = newPicture;
       this.updatedFields.add('profilePicture');
+   }
+
+   public get salt(): string{
+      return this.saltData;
+   }
+
+   public set salt(newSalt: string){
+      if(!newSalt)
+         throw new Error('New salt is invalid');
+      this.saltData = newSalt;
+      this.updatedFields.add('salt');
    }
 }
 export default User;

@@ -38,6 +38,13 @@ function updateById(tableName: string, columnNames: Array<string>, id: number): 
    return query.join(' ');
 }
 
+function generateSelectQuery(columnNames: Array<string>): string{
+   const set = columnNames.map((column, index)=>{
+      return `${column} = $${index + 1}`;
+   });
+   return set.join();
+}
+
 /**
  * Generate a query string to insert an entry into a given table
  * @param tableName The name of the table to construct the query for
@@ -154,5 +161,18 @@ export async function dbReadPackageFlag(client: PoolClient, packageId: number): 
    }catch(err){
       console.log('ERROR: read operation for PackageFlag failed.', err);
       return null;
+   }
+}
+
+export async function dbFind(client: PoolClient, tableName: string, columnNames: Array<string>, columnValues: Array<unknown>): Promise<Array<Record<string, unknown>>>{
+   const queryParams = {
+      text: `SELECT * FROM ${tableName} WHERE ${generateSelectQuery(columnNames)}`,
+      values: [columnValues]
+   };
+   try{
+      const res = await client.query(queryParams);
+      return res.rows;
+   }catch(err){
+      throw new Error('ERROR: find operation failed');
    }
 }

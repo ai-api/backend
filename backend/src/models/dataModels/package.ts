@@ -15,7 +15,7 @@ class Package {
    private shortDescription: string;
    private modelInput: string;
    private modelOutput: string;
-   private packageFlags: Array<number>;
+   private packageFlags: Array<PackageFlag>;
    private md: string;
    private updatedFields: Set<string>;
 
@@ -33,7 +33,7 @@ class Package {
     * @param numApiCalls (Optional) Number of times this package's model was requested. Defaults to 0
     */
    private constructor(client: PoolClient, userId: number, name: string, category: number, description: string, input: string, 
-      output: string, flags: Array<number>, markdown = '', id = -1, lastUpdated = new Date(), numApiCalls = 0){
+      output: string, flags: Array<PackageFlag>, markdown = '', id = -1, lastUpdated = new Date(), numApiCalls = 0){
       this.sysId = id;
       this.user = userId;
       this.lastUpdated = lastUpdated;
@@ -58,15 +58,17 @@ class Package {
     * @return A promise which resolves to a package object
     */
    public static async getInstance(client: PoolClient, id: number): Promise<Package>{
-      const [packageData, flagData] = await Promise.all([dbReadById(client, TableNames.PACKAGE, id), dbReadPackageFlag(client, id)]);
+      try{
+         const [packageData, packageFlags] = await Promise.all([dbReadById(client, TableNames.PACKAGE, id), PackageFlag.getInstances(client, id)]);
+         // Check if packageData is an empty object
+         if(Object.keys(packageData).length === 0 && packageData.constructor === Object)
+            throw new Error('Package information could not be retrieved from database');
 
-      if(Object.keys(packageData).length === 0 && packageData.constructor === Object)
-         throw new Error('Package information could not be retrieved from database');
-      if(flagData.length == 0)
-         throw new Error('Flags associated with given package ID could not be retrieved from database');
-      const flags = flagData.map( (flag: any) => flag.flagid);
-      return new Package(client, packageData.userid, packageData.name, packageData.category, packageData.description, packageData.input,
-         packageData.output, flags, packageData.markdown, packageData.id, packageData.lastupdated, packageData.numapicalls);
+         return new Package(client, packageData.userid, packageData.name, packageData.category, packageData.description, packageData.input,
+            packageData.output, packageFlags, packageData.markdown, packageData.id, packageData.lastupdated, packageData.numapicalls);
+      }catch(err){
+         throw new Error(err);
+      }
    }
 
    /**
@@ -83,7 +85,7 @@ class Package {
     * @return A Package object
     */
    public static createInstance(client: PoolClient, userId: number, name: string, category: number, description: string, 
-      input: string, output: string, flags: Array<number>, markdown = ''): Package{
+      input: string, output: string, flags: Array<PackageFlag>, markdown = ''): Package{
       return new Package(client, userId, name, category, description, input, output, flags, markdown);
    }
 
@@ -111,6 +113,9 @@ class Package {
     * is returned on a successful insert
     */
    private async create(): Promise<number>{
+      this.packageFlags.forEach((packageFlag=>{
+         packageFlag.save();
+      }));
       this.setLastUpdated();
       const columnNames: Array<string> = ['userId', 'lastUpdated','numApiCalls','name',
          'category', 'description', 'input', 'output', 'markdown'];

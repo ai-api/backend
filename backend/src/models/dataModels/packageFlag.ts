@@ -1,5 +1,5 @@
 import { PoolClient } from 'pg';
-import {dbCreate, dbReadById, dbUpdate, dbRemove} from '../../db/dbOperations';
+import {dbCreate, dbReadById, dbUpdate, dbRemove, dbReadPackageFlag} from '../../db/dbOperations';
 import TableNames from '../../db/enums/tableNames';
 
 export default class PackageFlag {
@@ -18,6 +18,18 @@ export default class PackageFlag {
       this.tableName = TableNames.PACKAGE_FLAG;
    }
    
+   public static async getInstances(client: PoolClient, packageId: number): Promise<Array<PackageFlag>> {
+      const packageFlagData = await dbReadPackageFlag(client, packageId);
+      if(!packageFlagData || packageFlagData.length == 0)
+         throw new Error('Flags associated with given package ID could not be retrieved from database');
+      return packageFlagData.map((packageFlag)=>{
+         const flagId = <number>packageFlag.flagid;
+         const packageId = <number>packageFlag.packageid;
+         const id = <number> packageFlag.id;
+         return new PackageFlag(client, flagId, packageId, id);
+      });
+   }
+
    public static async getInstance(client: PoolClient, id: number): Promise<PackageFlag>{
       const data = await dbReadById(client, TableNames.PACKAGE_FLAG, id);
       if(!data)

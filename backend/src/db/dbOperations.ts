@@ -150,7 +150,7 @@ export async function dbRemove(client: PoolClient, tableName: string, id: number
    }
 }
 
-export async function dbReadPackageFlag(client: PoolClient, packageId: number): Promise<any|null>{
+export async function dbReadPackageFlag(client: PoolClient, packageId: number): Promise<Array<Record<string, unknown>>|null>{
    const queryParams = {
       text: `SELECT * FROM ${TableNames.PACKAGE_FLAG} WHERE packageId = $1`,
       values: [packageId]

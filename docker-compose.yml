@@ -9,6 +9,8 @@ services:
       - aiapi_net
     ports: 
       - 80:80
+    volumes: 
+      - ./tensorflow/:/models/
   db:
     container_name: db
     image: postgres
@@ -27,8 +29,8 @@ services:
       - aiapi_net
     ports:
      - 7878:8080
-  ts:
-    container_name: ts
+  tf:
+    container_name: tf
     image: tensorflow/serving
     networks:
       - aiapi_net
@@ -41,8 +43,9 @@ services:
       --model_config_file_poll_wait_seconds=60
   
   
-# By creating a vlan for all of the microservices, we can reference each one by it's
-# container name instead of IP address in all of our code
+# By creating a vlan for all of the microservices, we can 
+# reference each one by it'scontainer name instead of IP 
+# address in all of our code
 networks:
   aiapi_net:
     name: aiapi_net

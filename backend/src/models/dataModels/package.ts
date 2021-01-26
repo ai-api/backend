@@ -122,9 +122,6 @@ class Package {
       const columnValues: Array<unknown> = [ this.user, this.lastUpdated, this.apiCalls, this.packageName,
          this.categoryId, this.shortDescription, this.modelInput, this.modelOutput, this.md];
       const id = await dbCreate(this.client, this.tableName, columnNames, columnValues);
-      if(id < 1)
-         throw new Error('Package could not be created');
-      this.setId(id);
       return id;
    }
 

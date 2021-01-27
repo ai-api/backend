@@ -9,7 +9,7 @@ export default class PackageFlag {
    private client: PoolClient;
    private updatedFields: Set<string>;
    private tableName: string;
-   private constructor(client: PoolClient, flagId: number, packageId: number, id = -1){
+   private constructor(client: PoolClient, flagId: number, packageId = -1, id = -1){
       this.client = client;
       this.sysId = id;
       this.flag = flagId;
@@ -37,9 +37,9 @@ export default class PackageFlag {
       return new PackageFlag(client, data.flagid, data.packageid, data.id);
    }
 
-   public static createInstance(client: PoolClient, flagId: number, packageId: number): PackageFlag{
-      if(flagId < 1 && packageId < 1)
-         throw new Error('One or more invalid paramters');
+   public static createInstance(client: PoolClient, flagId: number, packageId = -1): PackageFlag{
+      if(flagId < 1)
+         throw new Error('Invalid flag ID');
       return new PackageFlag(client, flagId, packageId);
    }
 
@@ -51,13 +51,9 @@ export default class PackageFlag {
     * client can't save the object
     */
    public async save(): Promise<number>{
-      try{
-         if(this.sysId >= 1)
-            return await this.update();
-         return await this.create();
-      }catch(err){
-         throw new Error(err);
-      }
+      if(this.sysId >= 1)
+         return this.update();
+      return this.create();
    }
 
    /**
@@ -77,7 +73,7 @@ export default class PackageFlag {
    }
 
    /**
-    * Updates an existing package entry in teh database using the 
+    * Updates an existing package entry in the database using the 
     * altered fields in the current object
     * @return A promise which resolves to a number. The package ID
     * is returned on a successful update, 0 is returned if the postgres
@@ -93,8 +89,6 @@ export default class PackageFlag {
          columnValues.push(this[fieldName as keyof PackageFlag]);
       });
       const id = await dbUpdate(this.client, this.tableName, columnNames, columnValues, this.sysId);
-      if(id < 1)
-         throw new Error('PackageFlag could not be updated');
       this.updatedFields.clear();
       return id;
    }
@@ -136,6 +130,7 @@ export default class PackageFlag {
       if(newId < 1)
          throw new Error('New ID is Invalid');
       this.package = newId;
+      this.updatedFields.add('packageId');
    }
 
    public get flagId(): number{
@@ -146,5 +141,6 @@ export default class PackageFlag {
       if(newId < 1)
          throw new Error('New ID is Invalid');
       this.flag = newId;
+      this.updatedFields.add('flagId');
    }
 }

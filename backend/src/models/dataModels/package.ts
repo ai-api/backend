@@ -58,17 +58,14 @@ class Package {
     * @return A promise which resolves to a package object
     */
    public static async getInstance(client: PoolClient, id: number): Promise<Package>{
-      try{
-         const [packageData, packageFlags] = await Promise.all([dbReadById(client, TableNames.PACKAGE, id), PackageFlag.getInstances(client, id)]);
-         // Check if packageData is an empty object
-         if(Object.keys(packageData).length === 0 && packageData.constructor === Object)
-            throw new Error('Package information could not be retrieved from database');
+      const [packageData, packageFlags] = await Promise.all([dbReadById(client, TableNames.PACKAGE, id), PackageFlag.getInstances(client, id)]);
+      // Check if packageData is an empty object
+      if(Object.keys(packageData).length === 0 && packageData.constructor === Object)
+         throw new Error('Package information could not be retrieved from database');
 
-         return new Package(client, packageData.userid, packageData.name, packageData.category, packageData.description, packageData.input,
-            packageData.output, packageFlags, packageData.markdown, packageData.id, packageData.lastupdated, packageData.numapicalls);
-      }catch(err){
-         throw new Error(err);
-      }
+      return new Package(client, packageData.userid, packageData.name, packageData.category, packageData.description, packageData.input,
+         packageData.output, packageFlags, packageData.markdown, packageData.id, packageData.lastupdated, packageData.numapicalls);
+
    }
 
    /**
@@ -85,8 +82,9 @@ class Package {
     * @return A Package object
     */
    public static createInstance(client: PoolClient, userId: number, name: string, category: number, description: string, 
-      input: string, output: string, flags: Array<PackageFlag>, markdown = ''): Package{
-      return new Package(client, userId, name, category, description, input, output, flags, markdown);
+      input: string, output: string, flags: Array<number>, markdown = ''): Package{
+      const packageFlags = flags.map(flagId => PackageFlag.createInstance(client, flagId));
+      return new Package(client, userId, name, category, description, input, output, packageFlags, markdown);
    }
 
    /**
@@ -97,13 +95,9 @@ class Package {
     * client can't save the object
     */
    public async save(): Promise<number>{
-      try{
-         if(this.sysId >= 1)
-            return await this.update();
-         return await this.create();
-      }catch(err){
-         throw new Error(err);
-      }
+      if(this.sysId >= 1)
+         return this.update();
+      return this.create();
    }
 
    /**
@@ -113,15 +107,18 @@ class Package {
     * is returned on a successful insert
     */
    private async create(): Promise<number>{
-      this.packageFlags.forEach((packageFlag=>{
-         packageFlag.save();
-      }));
+      
       this.setLastUpdated();
       const columnNames: Array<string> = ['userId', 'lastUpdated','numApiCalls','name',
          'category', 'description', 'input', 'output', 'markdown'];
       const columnValues: Array<unknown> = [ this.user, this.lastUpdated, this.apiCalls, this.packageName,
          this.categoryId, this.shortDescription, this.modelInput, this.modelOutput, this.md];
       const id = await dbCreate(this.client, this.tableName, columnNames, columnValues);
+
+      this.packageFlags.forEach((packageFlag=>{
+         packageFlag.packageId = id;
+         packageFlag.save();
+      }));
       return id;
    }
 
@@ -143,8 +140,6 @@ class Package {
          columnValues.push(this[fieldName as keyof Package]);
       });
       const id = await dbUpdate(this.client, this.tableName, columnNames, columnValues, this.sysId);
-      if(id < 1)
-         throw new Error('Package could not be updated');
       this.updatedFields.clear();
       return id;
    }

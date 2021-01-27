@@ -123,13 +123,17 @@ class Package {
    }
 
    /**
-    * Updates an existing package entry in teh database using the 
+    * Updates an existing package entry in the database using the 
     * altered fields in the current object
     * @return A promise which resolves to a number. The package ID
     * is returned on a successful update, 0 is returned if the postgres
     * client can't update the object
     */
    private async update(): Promise<number>{
+      if(this.updatedFields.has('flags')){
+         this.packageFlags.forEach(packageFlag => packageFlag.save());
+         this.updatedFields.delete('flags');
+      }
       if(this.updatedFields.size == 0)
          return 0;
       this.setLastUpdated();

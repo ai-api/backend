@@ -66,8 +66,6 @@ export default class PackageFlag {
       const columnNames: Array<string> = ['packageId', 'flagId'];
       const columnValues: Array<unknown> = [this.package, this.flag];
       const id = await dbCreate(this.client, this.tableName, columnNames, columnValues);
-      if(id < 1)
-         throw new Error('PackageFlag could not be created');
       this.setId(id);
       return id;
    }

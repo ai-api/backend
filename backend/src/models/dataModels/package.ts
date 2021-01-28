@@ -114,7 +114,7 @@ class Package {
       const columnValues: Array<unknown> = [ this.user, this.lastUpdated, this.apiCalls, this.packageName,
          this.categoryId, this.shortDescription, this.modelInput, this.modelOutput, this.md];
       const id = await dbCreate(this.client, this.tableName, columnNames, columnValues);
-
+      this.setId(id);
       this.packageFlags.forEach((packageFlag=>{
          packageFlag.packageId = id;
          packageFlag.save();
@@ -317,6 +317,40 @@ class Package {
          throw new Error('New output is invalid');
       this.modelOutput = newOutput;
       this.updatedFields.add('output');
+   }
+
+   public set flags(newFlags: Array<number>){
+      if(newFlags.length == 0)
+         throw new Error('New flags is an empty array');
+      const flagMap: Map<number, PackageFlag> = new Map();
+      const keep: Set<number> = new Set();
+      const add: Array<number> = [];
+      this.packageFlags.forEach(pf =>{
+         flagMap.set(pf.flagId, pf);
+      });
+      // Determine which flags will remain unchanged and must be added
+      newFlags.forEach(flag =>{
+         if(flagMap.has(flag))
+            keep.add(flag);
+         else
+            add.push(flag);
+      });
+      // Delete flags which are not in newFlags
+      flagMap.forEach((pf, flagId) =>{
+         if(!keep.has(flagId)){
+            if(add.length != 0){
+               pf.flagId = <number>add.pop();
+            }else{
+               pf.delete();
+               flagMap.delete(flagId);
+            }
+         }
+      });
+      // Add new flags
+      add.forEach(flagId =>{
+         const newFlag = PackageFlag.createInstance(this.client, flagId, this.sysId);
+         this.packageFlags.push(newFlag);
+      });
    }
 
    /**

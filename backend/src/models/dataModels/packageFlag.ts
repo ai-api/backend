@@ -119,7 +119,9 @@ export default class PackageFlag {
          throw new Error('New ID is invalid');
       this.sysId = newId;
    }
-
+   /**
+    * Gets the ID of the PackageFlag object
+    */
    public get packageId(): number{
       return this.package;
    }

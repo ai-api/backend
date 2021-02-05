@@ -128,7 +128,9 @@ class User {
          throw new Error('New ID is invalid');
       this.sysId = newId;
    }
-
+   /**
+    * Gets the username of the user object
+    */
    public get username(): string{
       return this.user;
    }

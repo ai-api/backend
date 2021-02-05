@@ -120,7 +120,8 @@ export default class PackageFlag {
       this.sysId = newId;
    }
    /**
-    * Gets the ID of the PackageFlag object
+    * Gets the ID of the Package object
+    * @return ID of the Package Object
     */
    public get packageId(): number{
       return this.package;

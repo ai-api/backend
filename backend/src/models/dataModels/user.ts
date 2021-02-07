@@ -135,6 +135,9 @@ class User {
       return this.user;
    }
 
+   /**
+    * Sets the username of the user object
+    */
    public set username(newUsername: string){
       if(!newUsername)
          throw new Error('New username is invalid');

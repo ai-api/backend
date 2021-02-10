@@ -76,7 +76,7 @@ export async function dbCreate(client: PoolClient, tableName: string, columnName
       const res = await client.query(queryParams);
       return res.rows[0].id;
    }catch(err){
-      console.log('ERROR: createPackage Failed. ' + err);
+      
       return -1;
    }
 }
@@ -102,7 +102,7 @@ export async function dbUpdate(client: PoolClient, tableName: string, columnName
       // Return success code
       return id;
    }catch(err){
-      console.log('ERROR: Update Failed. ' + err);
+      
       return -1;
    }
 }
@@ -124,7 +124,7 @@ export async function dbReadById(client: PoolClient, tableName: string, id: numb
       const res = await client.query(queryParams);
       return res.rows[0];
    }catch(err){
-      console.log('ERROR: read Failed. ' + err);
+      
       return null;
    }
 }
@@ -145,7 +145,7 @@ export async function dbRemove(client: PoolClient, tableName: string, id: number
       await client.query(queryParams);
       return 0;
    }catch(err){
-      console.log('ERROR: remove Failed.', err);
+      
       return -1;
    }
 }
@@ -159,7 +159,7 @@ export async function dbReadPackageFlag(client: PoolClient, packageId: number): 
       const res = await client.query(queryParams);
       return res.rows;
    }catch(err){
-      console.log('ERROR: read operation for PackageFlag failed.', err);
+      
       return null;
    }
 }

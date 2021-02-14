@@ -121,7 +121,7 @@ router.get('/createUser',(req, res, next)=>{
          console.log(err);
       } 
       // Create test package object
-      const testUser: User = User.createInstance(client, 'username', 'password', 'email@email.com', 'APIKEY', 'someurl.com');
+      const testUser: User = User.createInstance(client, 'username', 'password', 'email@email.com', 'APIKEY', 'someurl.com', 'SALT');
       console.log(testUser);
       // Insert package object into package table
       testUser.save()

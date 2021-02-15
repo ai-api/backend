@@ -67,18 +67,13 @@ function insertIntoTable(tableName: string, columnNames: Array<string>): string 
  * client can't create the object, -1 is returned if an error occurs
  */
 export async function dbCreate(client: PoolClient, tableName: string, columnNames: Array<string>, columnValues: Array<unknown>): Promise<number> {
-   try{
-      // Specify query command and parameters
-      const queryParams = {
-         text: insertIntoTable(tableName, columnNames),
-         values: columnValues
-      };
-      const res = await client.query(queryParams);
-      return res.rows[0].id;
-   }catch(err){
-      
-      return -1;
-   }
+   // Specify query command and parameters
+   const queryParams = {
+      text: insertIntoTable(tableName, columnNames),
+      values: columnValues
+   };
+   const res = await client.query(queryParams);
+   return res.rows[0].id;
 }
 /**
  * Update an existing entry in a given table with given values
@@ -92,19 +87,15 @@ export async function dbCreate(client: PoolClient, tableName: string, columnName
  * client can't update the object, -1 is returned if an error occurs
  */
 export async function dbUpdate(client: PoolClient, tableName: string, columnNames: Array<string>, columnValues: Array<unknown>, id: number): Promise<number> {
-   try{
-      // Specify query command and parameters
-      const queryParams = {
-         text: updateById(tableName, columnNames, id),
-         values: columnValues
-      };
-      const res = await client.query(queryParams);
-      // Return success code
-      return id;
-   }catch(err){
-      
-      return -1;
-   }
+
+   // Specify query command and parameters
+   const queryParams = {
+      text: updateById(tableName, columnNames, id),
+      values: columnValues
+   };
+   const res = await client.query(queryParams);
+   // Return success code
+   return id;
 }
 
 /**
@@ -120,13 +111,9 @@ export async function dbReadById(client: PoolClient, tableName: string, id: numb
       text: `SELECT * FROM ${tableName} WHERE id = $1`,
       values: [id]
    };
-   try{
-      const res = await client.query(queryParams);
-      return res.rows[0];
-   }catch(err){
-      
-      return null;
-   }
+
+   const res = await client.query(queryParams);
+   return res.rows[0];
 }
 
 /**
@@ -141,13 +128,9 @@ export async function dbRemove(client: PoolClient, tableName: string, id: number
       text: `DELETE FROM ${tableName} WHERE id = $1`,
       values: [id]
    };
-   try{
-      await client.query(queryParams);
-      return 0;
-   }catch(err){
-      
-      return -1;
-   }
+
+   await client.query(queryParams);
+   return 0;
 }
 
 export async function dbReadPackageFlag(client: PoolClient, packageId: number): Promise<Array<Record<string, unknown>>|null>{
@@ -155,13 +138,9 @@ export async function dbReadPackageFlag(client: PoolClient, packageId: number): 
       text: `SELECT * FROM ${TableNames.PACKAGE_FLAG} WHERE packageId = $1`,
       values: [packageId]
    };
-   try{
-      const res = await client.query(queryParams);
-      return res.rows;
-   }catch(err){
-      
-      return null;
-   }
+
+   const res = await client.query(queryParams);
+   return res.rows;
 }
 
 export async function dbFind(client: PoolClient, tableName: string, columnNames: Array<string>, columnValues: Array<unknown>): Promise<Array<Record<string, unknown>>>{
@@ -169,10 +148,6 @@ export async function dbFind(client: PoolClient, tableName: string, columnNames:
       text: `SELECT * FROM ${tableName} WHERE ${generateSelectQuery(columnNames)}`,
       values: [columnValues]
    };
-   try{
-      const res = await client.query(queryParams);
-      return res.rows;
-   }catch(err){
-      throw new Error('ERROR: find operation failed');
-   }
+   const res = await client.query(queryParams);
+   return res.rows;
 }

@@ -89,13 +89,18 @@ export async function dbCreate(client: PoolClient, tableName: string, columnName
 export async function dbUpdate(client: PoolClient, tableName: string, columnNames: Array<string>, columnValues: Array<unknown>, id: number): Promise<number> {
 
    // Specify query command and parameters
-   const queryParams = {
-      text: updateById(tableName, columnNames, id),
-      values: columnValues
-   };
-   const res = await client.query(queryParams);
-   // Return success code
-   return id;
+   try{
+      const queryParams = {
+         text: updateById(tableName, columnNames, id),
+         values: columnValues
+      };
+      const res = await client.query(queryParams);
+      // Return success code
+      return id;
+   }catch(err){
+      return -1;
+   }
+   
 }
 
 /**

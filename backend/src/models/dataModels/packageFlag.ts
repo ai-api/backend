@@ -87,6 +87,8 @@ export default class PackageFlag {
          columnValues.push(this[fieldName as keyof PackageFlag]);
       });
       const id = await dbUpdate(this.client, this.tableName, columnNames, columnValues, this.sysId);
+      if(id < 1)
+         throw new Error('Update Failed');
       this.updatedFields.clear();
       return id;
    }

@@ -94,7 +94,7 @@ export async function dbUpdate(client: PoolClient, tableName: string, columnName
          text: updateById(tableName, columnNames, id),
          values: columnValues
       };
-      const res = await client.query(queryParams);
+      await client.query(queryParams);
       // Return success code
       return id;
    }catch(err){
